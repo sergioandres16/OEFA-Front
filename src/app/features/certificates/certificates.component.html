@@ -1,0 +1,298 @@
+<div class="certificates-container">
+  <div class="certificates-header">
+    <div class="header-left">
+      <h1>Gestión de Certificados</h1>
+      <p>Administra los certificados digitales del sistema</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="showFilters = !showFilters">
+        <i class="icon-filter"></i>
+        Filtros
+      </button>
+      <button class="btn btn-primary" (click)="onUploadCertificate()">
+        <i class="icon-upload"></i>
+        Subir Certificado
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section" [class.expanded]="showFilters">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input
+          id="search"
+          type="text"
+          [(ngModel)]="filters.search"
+          (input)="onFilterChange()"
+          placeholder="Buscar por nombre, sujeto o emisor..."
+          class="form-control">
+      </div>
+
+      <div class="filter-group">
+        <label for="status">Estado</label>
+        <select
+          id="status"
+          [(ngModel)]="filters.status"
+          (change)="onFilterChange()"
+          class="form-control">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="issuer">Emisor</label>
+        <input
+          id="issuer"
+          type="text"
+          [(ngModel)]="filters.issuer"
+          (input)="onFilterChange()"
+          placeholder="Filtrar por emisor..."
+          class="form-control">
+      </div>
+
+      <div class="filter-group">
+        <label for="dateFrom">Desde</label>
+        <input
+          id="dateFrom"
+          type="date"
+          [(ngModel)]="filters.dateFrom"
+          (change)="onFilterChange()"
+          class="form-control">
+      </div>
+
+      <div class="filter-group">
+        <label for="dateTo">Hasta</label>
+        <input
+          id="dateTo"
+          type="date"
+          [(ngModel)]="filters.dateTo"
+          (change)="onFilterChange()"
+          class="form-control">
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-ghost" (click)="clearFilters()">
+          <i class="icon-clear"></i>
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-section">
+    <div class="table-header">
+      <div class="table-info">
+        <span>{{ totalElements }} certificados encontrados</span>
+        <span *ngIf="selectedCertificates.size > 0" class="selected-count">
+          {{ selectedCertificates.size }} seleccionados
+        </span>
+      </div>
+      
+      <div class="table-actions">
+        <button 
+          *ngIf="selectedCertificates.size > 0"
+          class="btn btn-outline btn-sm"
+          (click)="onBulkDelete()">
+          <i class="icon-delete"></i>
+          Eliminar Seleccionados
+        </button>
+        
+        <div class="page-size-selector">
+          <label for="pageSize">Mostrar:</label>
+          <select 
+            id="pageSize"
+            [(ngModel)]="pageSize"
+            (change)="onPageSizeChange(pageSize)"
+            class="form-control">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="checkbox-col">
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  [checked]="isAllSelected()"
+                  (change)="selectAllCertificates()"
+                  class="checkbox-input">
+                <span class="checkbox-custom"></span>
+              </label>
+            </th>
+            <th class="sortable" (click)="onSort('fileName')">
+              Archivo
+              <span class="sort-icon">{{ getSortIcon('fileName') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('subject')">
+              Sujeto
+              <span class="sort-icon">{{ getSortIcon('subject') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('issuer')">
+              Emisor
+              <span class="sort-icon">{{ getSortIcon('issuer') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('status')">
+              Estado
+              <span class="sort-icon">{{ getSortIcon('status') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('validTo')">
+              Expira
+              <span class="sort-icon">{{ getSortIcon('validTo') }}</span>
+            </th>
+            <th class="sortable" (click)="onSort('uploadedAt')">
+              Subido
+              <span class="sort-icon">{{ getSortIcon('uploadedAt') }}</span>
+            </th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="isLoading" class="loading-row">
+            <td colspan="8" class="text-center">
+              <div class="loading-spinner">
+                <div class="loading"></div>
+                <span>Cargando certificados...</span>
+              </div>
+            </td>
+          </tr>
+          
+          <tr *ngIf="!isLoading && filteredCertificates.length === 0" class="empty-row">
+            <td colspan="8" class="text-center">
+              <div class="empty-state">
+                <i class="icon-empty"></i>
+                <h3>No se encontraron certificados</h3>
+                <p>Intenta ajustar los filtros o sube un nuevo certificado</p>
+              </div>
+            </td>
+          </tr>
+          
+          <tr *ngFor="let certificate of filteredCertificates; trackBy: trackByCertificate" 
+              class="certificate-row">
+            <td>
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  [checked]="selectedCertificates.has(certificate.id)"
+                  (change)="toggleCertificateSelection(certificate.id)"
+                  class="checkbox-input">
+                <span class="checkbox-custom"></span>
+              </label>
+            </td>
+            <td>
+              <div class="file-info">
+                <div class="file-name">{{ certificate.fileName }}</div>
+                <div class="file-size">{{ formatFileSize(certificate.fileSize) }}</div>
+              </div>
+            </td>
+            <td>
+              <div class="subject-info">
+                <div class="subject-name">{{ certificate.subject }}</div>
+                <div class="serial-number">{{ certificate.certificateSerial }}</div>
+              </div>
+            </td>
+            <td>
+              <div class="issuer-info">{{ certificate.issuer }}</div>
+            </td>
+            <td>
+              <span class="badge" [class]="getStatusBadgeClass(certificate.status)">
+                {{ getStatusText(certificate.status) }}
+              </span>
+            </td>
+            <td>
+              <div class="date-info">
+                <div class="date">{{ formatDate(certificate.validTo) }}</div>
+                <div class="days-left" 
+                     [class.expiring]="isExpiringSoon(certificate.validTo)"
+                     [class.expired]="isExpired(certificate.validTo)">
+                  {{ getDaysUntilExpiration(certificate.validTo) }}
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="date">{{ formatDate(certificate.uploadedAt) }}</div>
+            </td>
+            <td>
+              <div class="actions">
+                <button 
+                  class="action-btn"
+                  (click)="onViewCertificate(certificate)"
+                  title="Ver detalles">
+                  <i class="icon-eye"></i>
+                </button>
+                
+                <button 
+                  *ngIf="canEditCertificate(certificate)"
+                  class="action-btn"
+                  (click)="onEditCertificate(certificate)"
+                  title="Editar">
+                  <i class="icon-edit"></i>
+                </button>
+                
+                <button 
+                  class="action-btn"
+                  (click)="onValidateCertificate(certificate)"
+                  title="Validar">
+                  <i class="icon-shield"></i>
+                </button>
+                
+                <button 
+                  *ngIf="canDeleteCertificate(certificate)"
+                  class="action-btn delete"
+                  (click)="onDeleteCertificate(certificate)"
+                  title="Eliminar">
+                  <i class="icon-delete"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="totalPages > 1">
+      <div class="pagination-info">
+        Mostrando {{ currentPage * pageSize + 1 }} a 
+        {{ getMaxItemsShown() }} de 
+        {{ totalElements }} registros
+      </div>
+      
+      <div class="pagination">
+        <button 
+          class="pagination-btn"
+          [disabled]="currentPage === 0"
+          (click)="onPageChange(currentPage - 1)">
+          <i class="icon-chevron-left"></i>
+        </button>
+        
+        <button 
+          *ngFor="let page of getPages()"
+          class="pagination-btn"
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
+          {{ page + 1 }}
+        </button>
+        
+        <button 
+          class="pagination-btn"
+          [disabled]="currentPage === totalPages - 1"
+          (click)="onPageChange(currentPage + 1)">
+          <i class="icon-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

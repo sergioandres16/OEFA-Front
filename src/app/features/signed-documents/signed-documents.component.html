@@ -1,0 +1,291 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="icon-document"></i>
+        Documentos Firmados
+      </h1>
+      <p class="page-subtitle">
+        Gestión de documentos firmados digitalmente
+      </p>
+    </div>
+    
+    <div class="header-actions">
+      <button 
+        class="btn btn-outline" 
+        (click)="exportDocuments()"
+        [disabled]="filteredDocuments.length === 0">
+        <i class="icon-download"></i>
+        Exportar
+      </button>
+      
+      <button 
+        class="btn btn-danger" 
+        (click)="confirmDeleteSelected()"
+        [disabled]="selectedDocuments.length === 0">
+        <i class="icon-trash"></i>
+        Eliminar Seleccionados ({{ selectedDocuments.length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <form [formGroup]="filterForm" class="filters-form">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="search">Buscar</label>
+          <input
+            id="search"
+            type="text"
+            formControlName="search"
+            class="form-control"
+            placeholder="Buscar por nombre, firmante o email...">
+        </div>
+        
+        <div class="filter-group">
+          <label for="documentType">Tipo de Documento</label>
+          <select id="documentType" formControlName="documentType" class="form-control">
+            <option value="">Todos los tipos</option>
+            <option value="PDF">PDF</option>
+            <option value="DOCX">DOCX</option>
+            <option value="XLSX">XLSX</option>
+            <option value="TXT">TXT</option>
+          </select>
+        </div>
+        
+        <div class="filter-group">
+          <label for="status">Estado</label>
+          <select id="status" formControlName="status" class="form-control">
+            <option value="">Todos los estados</option>
+            <option value="VALID">Válido</option>
+            <option value="INVALID">Inválido</option>
+            <option value="EXPIRED">Expirado</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filter-row">
+        <div class="filter-group">
+          <label for="signer">Firmante</label>
+          <input
+            id="signer"
+            type="text"
+            formControlName="signer"
+            class="form-control"
+            placeholder="Buscar por firmante...">
+        </div>
+        
+        <div class="filter-group">
+          <label for="dateFrom">Fecha Desde</label>
+          <input
+            id="dateFrom"
+            type="date"
+            formControlName="dateFrom"
+            class="form-control">
+        </div>
+        
+        <div class="filter-group">
+          <label for="dateTo">Fecha Hasta</label>
+          <input
+            id="dateTo"
+            type="date"
+            formControlName="dateTo"
+            class="form-control">
+        </div>
+        
+        <div class="filter-group">
+          <button type="button" class="btn btn-outline" (click)="clearFilters()">
+            <i class="icon-clear"></i>
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary">
+    <div class="summary-info">
+      <span class="results-count">
+        {{ filteredDocuments.length }} de {{ documents.length }} documentos
+      </span>
+      <span *ngIf="selectedDocuments.length > 0" class="selected-count">
+        ({{ selectedDocuments.length }} seleccionados)
+      </span>
+    </div>
+  </div>
+
+  <!-- Documents Table -->
+  <div class="table-container">
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Cargando documentos...</p>
+    </div>
+
+    <table *ngIf="!isLoading" class="data-table">
+      <thead>
+        <tr>
+          <th class="checkbox-column">
+            <input 
+              type="checkbox" 
+              [checked]="areAllCurrentPageSelected()"
+              (change)="selectAllDocuments()"
+              [disabled]="getPaginatedDocuments().length === 0">
+          </th>
+          <th>Documento</th>
+          <th>Tipo</th>
+          <th>Firmante</th>
+          <th>Fecha de Firma</th>
+          <th>Estado</th>
+          <th>Tamaño</th>
+          <th class="actions-column">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let document of getPaginatedDocuments()" 
+            [class.selected]="isDocumentSelected(document.id)">
+          <td class="checkbox-column">
+            <input 
+              type="checkbox" 
+              [checked]="isDocumentSelected(document.id)"
+              (change)="toggleDocumentSelection(document.id)">
+          </td>
+          <td class="document-info">
+            <div class="document-name">{{ document.documentName }}</div>
+            <div class="document-details">
+              <span class="certificate-serial">Serie: {{ document.certificateSerial }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="document-type-badge">{{ document.documentType }}</span>
+          </td>
+          <td class="signer-info">
+            <div class="signer-name">{{ document.signerName }}</div>
+            <div class="signer-email">{{ document.signerEmail }}</div>
+          </td>
+          <td class="date-column">
+            {{ formatDate(document.signatureDate) }}
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getStatusBadgeClass(document.status)">
+              {{ getStatusDisplayName(document.status) }}
+            </span>
+          </td>
+          <td class="size-column">
+            {{ formatFileSize(document.documentSize) }}
+          </td>
+          <td class="actions-column">
+            <div class="action-buttons">
+              <button 
+                class="btn-icon btn-primary" 
+                (click)="downloadDocument(document)"
+                title="Descargar documento">
+                <i class="icon-download"></i>
+              </button>
+              <button 
+                class="btn-icon btn-danger" 
+                (click)="confirmDeleteDocument(document)"
+                title="Eliminar documento">
+                <i class="icon-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        
+        <tr *ngIf="getPaginatedDocuments().length === 0" class="no-data">
+          <td colspan="8" class="no-data-message">
+            <div class="no-data-content">
+              <i class="icon-document"></i>
+              <h3>No se encontraron documentos</h3>
+              <p>No hay documentos firmados que coincidan con los filtros aplicados.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && totalPages > 1" class="pagination-container">
+    <div class="pagination-info">
+      Página {{ currentPage }} de {{ totalPages }} 
+      ({{ totalItems }} documentos total)
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="btn btn-outline btn-sm" 
+        (click)="goToPage(currentPage - 1)"
+        [disabled]="currentPage === 1">
+        <i class="icon-prev"></i>
+        Anterior
+      </button>
+      
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of [].constructor(totalPages); let i = index"
+          class="btn btn-outline btn-sm"
+          [class.active]="currentPage === i + 1"
+          (click)="goToPage(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </div>
+      
+      <button 
+        class="btn btn-outline btn-sm" 
+        (click)="goToPage(currentPage + 1)"
+        [disabled]="currentPage === totalPages">
+        Siguiente
+        <i class="icon-next"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="showDeleteModal" class="modal-overlay" (click)="cancelDelete()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Confirmar Eliminación</h2>
+      <button class="modal-close" (click)="cancelDelete()">
+        <i class="icon-close"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="warning-icon">
+        <i class="icon-warning"></i>
+      </div>
+      
+      <div *ngIf="documentToDelete" class="modal-message">
+        <p>¿Estás seguro de que deseas eliminar el documento?</p>
+        <div class="document-preview">
+          <strong>{{ documentToDelete.documentName }}</strong>
+          <p>Firmado por: {{ documentToDelete.signerName }}</p>
+          <p>Fecha: {{ formatDate(documentToDelete.signatureDate) }}</p>
+        </div>
+        <div class="warning-text">
+          <p><strong>Esta acción no se puede deshacer.</strong></p>
+        </div>
+      </div>
+      
+      <div *ngIf="!documentToDelete" class="modal-message">
+        <p>¿Estás seguro de que deseas eliminar los {{ selectedDocuments.length }} documentos seleccionados?</p>
+        <div class="warning-text">
+          <p><strong>Esta acción no se puede deshacer.</strong></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="cancelDelete()">
+        Cancelar
+      </button>
+      <button class="btn btn-danger" (click)="deleteDocument()">
+        <i class="icon-trash"></i>
+        Eliminar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+<div class="login-container">
+  <div class="login-background">
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+    <div class="background-shape shape-3"></div>
+  </div>
+  
+  <div class="login-content">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-container">
+          <div class="logo">
+            <span class="logo-text">OEFA</span>
+          </div>
+        </div>
+        <h1 class="login-title">Acceso de Firmante</h1>
+        <p class="login-subtitle">Ingresa tu PIN de 6 dígitos para acceder</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-content">
+          <div class="form-group">
+            <label for="pin" class="form-label">
+              <i class="icon-key"></i>
+              PIN de Acceso
+            </label>
+            <input
+              id="pin"
+              type="password"
+              formControlName="pin"
+              class="form-control pin-input"
+              [class.is-invalid]="isFieldInvalid('pin')"
+              placeholder="••••••"
+              maxlength="6"
+              autocomplete="current-password">
+            <span *ngIf="getFieldError('pin')" class="form-error">
+              {{ getFieldError('pin') }}
+            </span>
+          </div>
+
+          <div *ngIf="error" class="alert alert-error">
+            <i class="icon-alert"></i>
+            {{ error }}
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-secondary btn-lg"
+              [disabled]="isLoading || loginForm.invalid">
+              <span *ngIf="isLoading" class="loading"></span>
+              <span *ngIf="!isLoading">Verificar PIN</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="login-footer">
+        <div class="demo-credentials">
+          <h3>PIN Demo:</h3>
+          <div class="demo-section">
+            <strong>PIN de Prueba:</strong>
+            <span>123456</span>
+          </div>
+        </div>
+        
+        <div class="help-section">
+          <h3>¿Necesitas ayuda?</h3>
+          <ul>
+            <li>Si olvidaste tu PIN, contacta al administrador</li>
+            <li>El PIN debe tener exactamente 6 dígitos</li>
+            <li>Después de 3 intentos fallidos, tu cuenta será bloqueada</li>
+          </ul>
+        </div>
+        
+        <div class="navigation-links">
+          <a routerLink="/admin/login" class="nav-link">
+            ¿Eres administrador? Accede aquí
+          </a>
+        </div>
+        
+        <p class="copyright">
+          © 2024 OEFA - Organismo de Evaluación y Fiscalización Ambiental
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
