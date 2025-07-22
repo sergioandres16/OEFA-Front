@@ -49,7 +49,7 @@ export interface UserListParams {
   providedIn: 'root'
 })
 export class UserService {
-  private readonly API_URL = 'http://10.100.20.54:9002/auth/api/v1';
+  private readonly API_URL = 'https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe/auth/api/v1';
   
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   public isLoading$ = this.isLoadingSubject.asObservable();

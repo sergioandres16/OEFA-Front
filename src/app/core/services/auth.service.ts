@@ -8,7 +8,7 @@ import { User, JwtResponse, LoginRequest, ApiResponse, UserRole } from '../model
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://10.100.20.54:9002/auth/api/v1';
+  private readonly API_URL = 'https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe/auth/api/v1';
   
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
@@ -53,46 +53,16 @@ export class AuthService {
       );
   }
 
-  loginFirmante(pin: string): Observable<JwtResponse> {
+  loginFirmante(dni: string, pin: string): Observable<JwtResponse> {
     this.isLoadingSubject.next(true);
     
-    // Para desarrollo, permite bypass con PIN específico
-    if (pin === '123456') {
-      const mockResponse: JwtResponse = {
-        accessToken: 'mock-jwt-token-firmante',
-        refreshToken: 'mock-refresh-token-firmante',
-        tokenType: 'Bearer',
-        userId: 2,
-        nombre: 'Juan Carlos',
-        apellido: 'Pérez Rodríguez',
-        email: 'juan.perez@empresa.com',
-        dni: '12345678',
-        role: UserRole.ROLE_FIRMANTE,
-        cargo: 'Especialista en Medio Ambiente',
-        status: 'ACTIVE'
-      };
-      
-      this.handleAuthSuccess(mockResponse);
-      this.isLoadingSubject.next(false);
-      return of(mockResponse);
-    }
-    
-    // Implementación real (comentada para desarrollo)
-    // const request = { pin };
-    // return this.http.post<JwtResponse>(`${this.API_URL}/firmante/login`, request)
-    //   .pipe(
-    //     tap(response => this.handleAuthSuccess(response)),
-    //     catchError(error => this.handleError(error)),
-    //     tap(() => this.isLoadingSubject.next(false))
-    //   );
-    
-    // Simular error de PIN inválido
-    this.isLoadingSubject.next(false);
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.error({ userMessage: 'PIN inválido' });
-      }, 1000);
-    });
+    const request = { dni, pin };
+    return this.http.post<JwtResponse>(`${this.API_URL}/firmante/login`, request)
+      .pipe(
+        tap(response => this.handleAuthSuccess(response)),
+        catchError(error => this.handleError(error)),
+        tap(() => this.isLoadingSubject.next(false))
+      );
   }
 
   refreshToken(): Observable<JwtResponse> {
@@ -163,6 +133,14 @@ export class AuthService {
 
   createFirmante(firmanteData: any): Observable<any> {
     return this.http.post(`${this.API_URL}/admin/create-firmante`, firmanteData)
+      .pipe(
+        catchError(error => this.handleError(error))
+      );
+  }
+
+  activateFirmante(activationToken: string, pin: string): Observable<any> {
+    const request = { activationToken, pin };
+    return this.http.post(`${this.API_URL}/firmante/activate`, request)
       .pipe(
         catchError(error => this.handleError(error))
       );

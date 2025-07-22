@@ -8,7 +8,7 @@ import { ApiResponse, PagedResponse } from '../models/user.model';
   providedIn: 'root'
 })
 export class CertificateService {
-  private readonly API_URL = 'http://localhost:8080/api/certificates';
+  private readonly API_URL = 'https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe/certificates/api/v1';
 
   constructor(private http: HttpClient) {}
 

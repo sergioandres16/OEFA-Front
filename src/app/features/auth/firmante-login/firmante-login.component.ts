@@ -32,6 +32,7 @@ export class FirmanteLoginComponent implements OnInit {
 
   createForm(): FormGroup {
     return this.fb.group({
+      dni: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
       pin: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
     });
   }
@@ -43,9 +44,9 @@ export class FirmanteLoginComponent implements OnInit {
     }
 
     this.error = null;
-    const { pin } = this.loginForm.value;
+    const { dni, pin } = this.loginForm.value;
     
-    this.authService.loginFirmante(pin).subscribe({
+    this.authService.loginFirmante(dni, pin).subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },
@@ -62,6 +63,9 @@ export class FirmanteLoginComponent implements OnInit {
         return 'Este campo es requerido';
       }
       if (field.errors['pattern']) {
+        if (fieldName === 'dni') {
+          return 'El DNI debe tener exactamente 8 dígitos';
+        }
         return 'El PIN debe tener exactamente 6 dígitos';
       }
     }
