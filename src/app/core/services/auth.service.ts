@@ -147,7 +147,12 @@ export class AuthService {
   }
 
   private handleAuthSuccess(response: JwtResponse): void {
-    const user: User = {
+    // Store only essential auth data
+    localStorage.setItem('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    
+    // Store minimal user info for session
+    const userSession: User = {
       id: response.userId,
       nombre: response.nombre,
       apellido: response.apellido,
@@ -155,14 +160,11 @@ export class AuthService {
       dni: response.dni,
       role: response.role,
       cargo: response.cargo,
-      status: response.status as any
+      status: response.status
     };
-
-    localStorage.setItem('accessToken', response.accessToken);
-    localStorage.setItem('refreshToken', response.refreshToken);
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('currentUser', JSON.stringify(userSession));
     
-    this.currentUserSubject.next(user);
+    this.currentUserSubject.next(userSession);
     this.tokenSubject.next(response.accessToken);
   }
 

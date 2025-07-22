@@ -133,7 +133,7 @@ export class UsersComponent implements OnInit {
         user.nombre.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         user.apellido.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         user.email.toLowerCase().includes(this.filters.search.toLowerCase()) ||
-        user.dni.includes(this.filters.search);
+        (user.dni?.includes(this.filters.search) || false);
       
       const matchesRole = !this.filters.role || user.role === this.filters.role;
       const matchesStatus = !this.filters.status || user.status === this.filters.status;
@@ -304,41 +304,41 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  getRoleDisplayName(role: UserRole): string {
+  getRoleDisplayName(role: string): string {
     switch (role) {
-      case UserRole.ROLE_ADMIN:
+      case 'ROLE_ADMIN':
         return 'Administrador';
-      case UserRole.ROLE_FIRMANTE:
+      case 'ROLE_FIRMANTE':
         return 'Firmante';
       default:
         return 'Usuario';
     }
   }
 
-  getStatusDisplayName(status: UserStatus): string {
+  getStatusDisplayName(status: string): string {
     switch (status) {
-      case UserStatus.ACTIVE:
+      case 'ACTIVO':
         return 'Activo';
-      case UserStatus.INACTIVE:
+      case 'INACTIVE':
         return 'Inactivo';
-      case UserStatus.PENDING:
+      case 'PENDING':
         return 'Pendiente';
-      case UserStatus.LOCKED:
+      case 'LOCKED':
         return 'Bloqueado';
       default:
         return 'Desconocido';
     }
   }
 
-  getStatusBadgeClass(status: UserStatus): string {
+  getStatusBadgeClass(status: string): string {
     switch (status) {
-      case UserStatus.ACTIVE:
+      case 'ACTIVO':
         return 'badge-success';
-      case UserStatus.INACTIVE:
+      case 'INACTIVE':
         return 'badge-error';
-      case UserStatus.PENDING:
+      case 'PENDING':
         return 'badge-warning';
-      case UserStatus.LOCKED:
+      case 'LOCKED':
         return 'badge-error';
       default:
         return 'badge-info';

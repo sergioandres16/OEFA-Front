@@ -3,10 +3,10 @@ export interface User {
   nombre: string;
   apellido: string;
   email: string;
-  dni: string;
-  role: UserRole;
-  cargo?: string;
-  status: UserStatus;
+  dni: string | null;
+  role: string;
+  cargo?: string | null;
+  status: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

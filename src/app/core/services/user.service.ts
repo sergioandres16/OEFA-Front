@@ -14,7 +14,7 @@ export interface CreateFirmanteRequest {
 
 export interface ResendCredentialsRequest {
   email: string;
-  dni?: string;
+  dni?: string | null;
   regeneratePassword?: boolean;
   additionalInfo?: string;
 }
@@ -303,7 +303,7 @@ export class UserService {
         }
         
         if (params?.dni) {
-          users = users.filter(user => user.dni.includes(params.dni!));
+          users = users.filter(user => user.dni?.includes(params.dni!) || false);
         }
         
         // Apply sorting
