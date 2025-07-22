@@ -68,8 +68,8 @@ export class LoginComponent implements OnInit {
         }
       });
     } else {
-      const { pin } = this.loginForm.value;
-      this.authService.loginFirmante(pin).subscribe({
+      const { dni, pin } = this.loginForm.value;
+      this.authService.loginFirmante(dni, pin).subscribe({
         next: () => {
           this.router.navigate(['/dashboard']);
         },
