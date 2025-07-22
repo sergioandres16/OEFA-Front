@@ -32,9 +32,9 @@ export interface JwtResponse {
   nombre: string;
   apellido: string;
   email: string;
-  dni: string;
-  role: UserRole;
-  cargo?: string;
+  dni: string | null;
+  role: string;
+  cargo: string | null;
   status: string;
 }
 
