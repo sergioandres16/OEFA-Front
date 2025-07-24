@@ -109,7 +109,7 @@
               <span class="sort-icon">{{ getSortIcon('status') }}</span>
             </th>
             <th class="sortable" (click)="onSort('createdAt')">
-              Creado
+              Fecha de Registro
               <span class="sort-icon">{{ getSortIcon('createdAt') }}</span>
             </th>
             <th class="actions-col">Acciones</th>
@@ -164,7 +164,7 @@
               </span>
             </td>
             <td>
-              <div class="date">{{ formatDate(user.createdAt!) }}</div>
+              <div class="date">{{ formatDateTime(user.createdAt!) }}</div>
             </td>
             <td>
               <div class="actions">

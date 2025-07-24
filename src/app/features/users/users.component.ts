@@ -340,7 +340,7 @@ export class UsersComponent implements OnInit {
         return 'Activo';
       case 'INACTIVE':
         return 'Inactivo';
-      case 'PENDING':
+      case 'PENDIENTE':
         return 'Pendiente';
       case 'LOCKED':
         return 'Bloqueado';
@@ -355,7 +355,7 @@ export class UsersComponent implements OnInit {
         return 'badge-success';
       case 'INACTIVE':
         return 'badge-error';
-      case 'PENDING':
+      case 'PENDIENTE':
         return 'badge-warning';
       case 'LOCKED':
         return 'badge-error';
@@ -364,12 +364,27 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: string | Date): string {
     return new Date(date).toLocaleDateString('es-PE', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  formatDateTime(date: string | Date): string {
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('es-PE', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    const formattedTime = dateObj.toLocaleTimeString('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+    return `${formattedDate} ${formattedTime}`;
   }
 
   getFieldError(fieldName: string): string | null {
