@@ -1,0 +1,50 @@
+<nav class="sidebar" [class.expanded]="isSidebarExpanded">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <span class="logo-text">OEFA</span>
+      </div>
+      <div class="logo-info" *ngIf="isSidebarExpanded">
+        <h3>Sistema de Firmas</h3>
+        <p>Certificados Digitales</p>
+      </div>
+    </div>
+    <button class="sidebar-toggle" (click)="toggleSidebar()">
+      <i class="icon-menu"></i>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <div class="sidebar-user">
+      <div class="user-avatar">
+        <span>{{ getUserInitials() }}</span>
+      </div>
+      <div class="user-info" *ngIf="isSidebarExpanded">
+        <h4>{{ getUserDisplayName() }}</h4>
+        <p>{{ getRoleDisplayName() }}</p>
+        <span class="user-status">{{ currentUser?.status }}</span>
+      </div>
+    </div>
+
+    <div class="sidebar-menu">
+      <ul class="menu-list">
+        <li class="menu-item" *ngFor="let item of getVisibleMenuItems()">
+          <a 
+            [routerLink]="item.route" 
+            routerLinkActive="active" 
+            class="menu-link">
+            <i class="menu-icon icon-{{ item.icon }}"></i>
+            <span class="menu-text" *ngIf="isSidebarExpanded">{{ item.title }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <i class="icon-logout"></i>
+      <span *ngIf="isSidebarExpanded">Cerrar Sesión</span>
+    </button>
+  </div>
+</nav>

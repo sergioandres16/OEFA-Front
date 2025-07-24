@@ -6,19 +6,18 @@ import { AuthService } from '../../core/services/auth.service';
 import { UserService, CreateFirmanteRequest, UserListParams, PagedResponse } from '../../core/services/user.service';
 import { User, UserRole, UserStatus } from '../../core/models/user.model';
 import { NotificationService } from '../../shared/services/notification.service';
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, SidebarComponent],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
-  currentUser: User | null = null;
-  isSidebarExpanded = true;
   
   // Filters
   filters = {
@@ -56,7 +55,6 @@ export class UsersComponent implements OnInit {
   ];
 
   constructor(
-    private authService: AuthService,
     private userService: UserService,
     private fb: FormBuilder,
     private notificationService: NotificationService
@@ -66,10 +64,7 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-      this.loadUsers();
-    });
+    this.loadUsers();
   }
 
   createForm(): FormGroup {
@@ -470,73 +465,5 @@ export class UsersComponent implements OnInit {
     return Math.min((this.currentPage + 1) * this.pageSize, this.totalElements);
   }
 
-  // Sidebar methods (copied from dashboard)
-  menuItems = [
-    {
-      title: 'Panel Principal',
-      icon: 'dashboard',
-      route: '/dashboard',
-      roles: ['ROLE_ADMIN']
-    },
-    {
-      title: 'Certificados',
-      icon: 'certificate',
-      route: '/certificates',
-      roles: ['ROLE_ADMIN']
-    },
-    {
-      title: 'Usuarios',
-      icon: 'users',
-      route: '/users',
-      roles: ['ROLE_ADMIN']
-    },
-    {
-      title: 'Documentos Firmados',
-      icon: 'document',
-      route: '/signed-documents',
-      roles: ['ROLE_ADMIN']
-    },
-    {
-      title: 'Seguridad',
-      icon: 'shield',
-      route: '/security',
-      roles: ['ROLE_ADMIN']
-    }
-  ];
-
-  toggleSidebar() {
-    this.isSidebarExpanded = !this.isSidebarExpanded;
-  }
-
-  logout() {
-    this.authService.logout();
-  }
-
-  hasRole(requiredRoles: string[]): boolean {
-    return this.currentUser ? requiredRoles.includes(this.currentUser.role) : false;
-  }
-
-  getVisibleMenuItems() {
-    return this.menuItems.filter(item => this.hasRole(item.roles));
-  }
-
-  getUserDisplayName(): string {
-    if (this.currentUser) {
-      return `${this.currentUser.nombre} ${this.currentUser.apellido}`;
-    }
-    return 'Usuario';
-  }
-
-  getUserInitials(): string {
-    if (this.currentUser) {
-      return `${this.currentUser.nombre.charAt(0)}${this.currentUser.apellido.charAt(0)}`;
-    }
-    return 'U';
-  }
-
-  getCurrentUserRole(): string {
-    if (!this.currentUser) return '';
-    return this.getRoleDisplayName(this.currentUser.role);
-  }
 
 }
