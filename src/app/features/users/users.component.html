@@ -1,10 +1,95 @@
-<app-layout>
-<div class="users-container">
-  <div class="users-header">
-    <div class="header-left">
-      <h1>Gestión de Firmantes</h1>
-      <p>Administra los firmantes del sistema de firmas digitales</p>
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <nav class="sidebar" [class.expanded]="isSidebarExpanded">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <span class="logo-text">OEFA</span>
+        </div>
+        <div class="logo-info" *ngIf="isSidebarExpanded">
+          <h3>Sistema de Firmas</h3>
+          <p>Certificados Digitales</p>
+        </div>
+      </div>
+      <button class="sidebar-toggle" (click)="toggleSidebar()">
+        <i class="icon-menu"></i>
+      </button>
     </div>
+
+    <div class="sidebar-content">
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          <span>{{ getUserInitials() }}</span>
+        </div>
+        <div class="user-info" *ngIf="isSidebarExpanded">
+          <h4>{{ getUserDisplayName() }}</h4>
+          <p>{{ getRoleDisplayName() }}</p>
+          <span class="user-status">{{ currentUser?.status }}</span>
+        </div>
+      </div>
+
+      <div class="sidebar-menu">
+        <ul class="menu-list">
+          <li class="menu-item" *ngFor="let item of getVisibleMenuItems()">
+            <a 
+              [routerLink]="item.route" 
+              routerLinkActive="active" 
+              class="menu-link">
+              <i class="menu-icon icon-{{ item.icon }}"></i>
+              <span class="menu-text" *ngIf="isSidebarExpanded">{{ item.title }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <i class="icon-logout"></i>
+        <span *ngIf="isSidebarExpanded">Cerrar Sesión</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content" [class.sidebar-expanded]="isSidebarExpanded">
+    <header class="main-header">
+      <div class="header-left">
+        <button class="menu-toggle" (click)="toggleSidebar()">
+          <i class="icon-menu"></i>
+        </button>
+        <h1 class="page-title">Gestión de Firmantes</h1>
+      </div>
+      
+      <div class="header-right">
+        <div class="header-actions">
+          <button class="header-action">
+            <i class="icon-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <button class="header-action">
+            <i class="icon-settings"></i>
+          </button>
+        </div>
+        
+        <div class="user-menu">
+          <div class="user-avatar">
+            <span>{{ getUserInitials() }}</span>
+          </div>
+          <div class="user-details">
+            <span class="user-name">{{ getUserDisplayName() }}</span>
+            <span class="user-role">{{ getRoleDisplayName() }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-body">
+      <div class="users-container">
+        <div class="users-header">
+          <div class="header-left">
+            <p>Administra los firmantes del sistema de firmas digitales</p>
+          </div>
     <div class="header-actions">
       <button class="btn btn-primary" (click)="openCreateModal()">
         <i class="icon-user-add"></i>
@@ -459,4 +544,7 @@
     </form>
   </div>
 </div>
-</app-layout>
+      </div>
+    </main>
+  </div>
+</div>
