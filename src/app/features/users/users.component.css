@@ -166,13 +166,6 @@
   margin: 0 auto;
 }
 
-.users-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  gap: 2rem;
-}
 
 .header-left h1 {
   font-size: 1.75rem;
@@ -660,11 +653,6 @@
 }
 
 @media (max-width: 768px) {
-  .users-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
   
   .header-actions {
     width: 100%;
