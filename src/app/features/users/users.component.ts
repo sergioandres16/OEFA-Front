@@ -6,12 +6,11 @@ import { AuthService } from '../../core/services/auth.service';
 import { UserService, CreateFirmanteRequest, UserListParams, PagedResponse } from '../../core/services/user.service';
 import { User, UserRole, UserStatus } from '../../core/models/user.model';
 import { NotificationService } from '../../shared/services/notification.service';
-import { LayoutComponent } from '../../shared/components/layout/layout.component';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, LayoutComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
@@ -535,16 +534,9 @@ export class UsersComponent implements OnInit {
     return 'U';
   }
 
-  getRoleDisplayName(): string {
+  getCurrentUserRole(): string {
     if (!this.currentUser) return '';
-    
-    switch (this.currentUser.role) {
-      case 'ROLE_ADMIN':
-        return 'Administrador';
-      case 'ROLE_FIRMANTE':
-        return 'Firmante';
-      default:
-        return 'Usuario';
-    }
+    return this.getRoleDisplayName(this.currentUser.role);
   }
+
 }

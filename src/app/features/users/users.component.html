@@ -23,7 +23,7 @@
         </div>
         <div class="user-info" *ngIf="isSidebarExpanded">
           <h4>{{ getUserDisplayName() }}</h4>
-          <p>{{ getRoleDisplayName() }}</p>
+          <p>{{ getCurrentUserRole() }}</p>
           <span class="user-status">{{ currentUser?.status }}</span>
         </div>
       </div>
@@ -78,7 +78,7 @@
           </div>
           <div class="user-details">
             <span class="user-name">{{ getUserDisplayName() }}</span>
-            <span class="user-role">{{ getRoleDisplayName() }}</span>
+            <span class="user-role">{{ getCurrentUserRole() }}</span>
           </div>
         </div>
       </div>
@@ -544,7 +544,6 @@
     </form>
   </div>
 </div>
-      </div>
     </main>
   </div>
 </div>
