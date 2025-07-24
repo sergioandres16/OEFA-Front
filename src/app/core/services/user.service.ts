@@ -12,6 +12,26 @@ export interface CreateFirmanteRequest {
   cargo: string;
 }
 
+export interface CreateFirmanteData {
+  id: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+  dni: string;
+  cargo: string;
+  role: string;
+  status: string;
+  createdAt: string;
+  notificationSent: boolean;
+  notificationMethod: string;
+}
+
+export interface CreateFirmanteResponse {
+  success: boolean;
+  message: string;
+  data: CreateFirmanteData;
+}
+
 export interface ResendCredentialsRequest {
   email: string;
   dni?: string | null;
@@ -85,10 +105,10 @@ export class UserService {
   /**
    * Create a new firmante (Admin only)
    */
-  createFirmante(request: CreateFirmanteRequest): Observable<ApiResponse> {
+  createFirmante(request: CreateFirmanteRequest): Observable<CreateFirmanteResponse> {
     this.isLoadingSubject.next(true);
     
-    return this.http.post<ApiResponse>(`${this.API_URL}/admin/create-firmante`, request)
+    return this.http.post<CreateFirmanteResponse>(`${this.API_URL}/admin/create-firmante`, request)
       .pipe(
         tap(() => this.isLoadingSubject.next(false)),
         catchError(error => {

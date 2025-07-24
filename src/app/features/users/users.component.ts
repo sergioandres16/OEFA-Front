@@ -223,9 +223,14 @@ export class UsersComponent implements OnInit {
     
     this.userService.createFirmante(request).subscribe({
       next: (response) => {
-        alert('Usuario creado exitosamente');
-        this.closeCreateModal();
-        this.loadUsers();
+        if (response.success) {
+          alert(`Usuario creado exitosamente: ${response.message}`);
+          console.log('Firmante creado:', response.data);
+          this.closeCreateModal();
+          this.loadUsers();
+        } else {
+          alert(`Error: ${response.message}`);
+        }
       },
       error: (error) => {
         console.error('Error creating user:', error);
