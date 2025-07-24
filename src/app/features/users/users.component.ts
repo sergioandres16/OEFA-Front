@@ -119,6 +119,7 @@ export class UsersComponent implements OnInit {
   }
 
   applyFilters() {
+    // Apply filters first
     this.filteredUsers = this.users.filter(user => {
       // Search filter - now includes cargo
       const matchesSearch = !this.filters.search || 
@@ -144,6 +145,53 @@ export class UsersComponent implements OnInit {
       
       return matchesSearch && matchesStatus && matchesDateRange;
     });
+    
+    // Then apply sorting
+    this.applySorting();
+  }
+
+  applySorting() {
+    this.filteredUsers.sort((a, b) => {
+      let valueA: any;
+      let valueB: any;
+      
+      switch (this.sortBy) {
+        case 'nombre':
+          valueA = `${a.nombre} ${a.apellido}`.toLowerCase();
+          valueB = `${b.nombre} ${b.apellido}`.toLowerCase();
+          break;
+        case 'email':
+          valueA = a.email.toLowerCase();
+          valueB = b.email.toLowerCase();
+          break;
+        case 'dni':
+          valueA = a.dni || '';
+          valueB = b.dni || '';
+          break;
+        case 'role':
+          valueA = a.role;
+          valueB = b.role;
+          break;
+        case 'status':
+          valueA = a.status;
+          valueB = b.status;
+          break;
+        case 'createdAt':
+          valueA = new Date(a.createdAt!);
+          valueB = new Date(b.createdAt!);
+          break;
+        default:
+          return 0;
+      }
+      
+      if (valueA < valueB) {
+        return this.sortDirection === 'asc' ? -1 : 1;
+      }
+      if (valueA > valueB) {
+        return this.sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
   }
 
   onFilterChange() {
@@ -167,7 +215,7 @@ export class UsersComponent implements OnInit {
       this.sortBy = column;
       this.sortDirection = 'asc';
     }
-    this.loadUsers();
+    this.applySorting();
   }
 
   getSortIcon(column: string): string {

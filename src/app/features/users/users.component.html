@@ -11,7 +11,7 @@
         </button>
         <h1 class="page-title">Gestión de Firmantes</h1>
       </div>
-      
+
       <div class="header-right">
         <button class="btn btn-primary" (click)="openCreateModal()">
           <i class="icon-user-add"></i>
@@ -35,11 +35,11 @@
           (input)="applyFilters()"
           placeholder="Nombre, email, DNI o cargo...">
       </div>
-      
+
       <div class="filter-group">
         <label for="status">Estado</label>
-        <select 
-          id="status" 
+        <select
+          id="status"
           class="form-control"
           [(ngModel)]="filters.status"
           (change)="applyFilters()">
@@ -49,7 +49,7 @@
           </option>
         </select>
       </div>
-      
+
       <div class="filter-group">
         <label for="dateFrom">Desde</label>
         <input
@@ -59,7 +59,7 @@
           [(ngModel)]="filters.dateFrom"
           (change)="applyFilters()">
       </div>
-      
+
       <div class="filter-group">
         <label for="dateTo">Hasta</label>
         <input
@@ -69,7 +69,7 @@
           [(ngModel)]="filters.dateTo"
           (change)="applyFilters()">
       </div>
-      
+
       <div class="filter-actions">
         <button class="btn btn-secondary" (click)="clearFilters()">
           Limpiar filtros
@@ -84,11 +84,11 @@
       <div class="table-info">
         <span>{{ totalElements }} firmantes encontrados</span>
       </div>
-      
+
       <div class="table-actions">
         <div class="page-size-selector">
           <label for="pageSize">Mostrar:</label>
-          <select 
+          <select
             id="pageSize"
             [(ngModel)]="pageSize"
             (change)="onPageSizeChange(pageSize)"
@@ -141,7 +141,7 @@
               </div>
             </td>
           </tr>
-          
+
           <tr *ngIf="!isLoading && filteredUsers.length === 0" class="empty-row">
             <td colspan="7" class="text-center">
               <div class="empty-state">
@@ -151,7 +151,7 @@
               </div>
             </td>
           </tr>
-          
+
           <tr *ngFor="let user of filteredUsers" class="user-row">
             <td>
               <div class="user-info">
@@ -185,29 +185,29 @@
             </td>
             <td>
               <div class="actions">
-                <button 
+                <button
                   class="action-btn"
                   (click)="onViewUser(user)"
                   title="Ver detalles">
                   <i class="icon-eye"></i>
                 </button>
-                
-                <button 
+
+                <button
                   class="action-btn"
                   (click)="onEditUser(user)"
                   title="Editar">
                   <i class="icon-edit"></i>
                 </button>
-                
-                <button 
+
+                <button
                   *ngIf="user.status === 'PENDING'"
                   class="action-btn"
                   (click)="onResendCredentials(user)"
                   title="Reenviar credenciales">
                   <i class="icon-mail"></i>
                 </button>
-                
-                <button 
+
+                <button
                   class="action-btn delete"
                   (click)="onDeleteUser(user)"
                   title="Eliminar">
@@ -223,28 +223,28 @@
     <!-- Pagination -->
     <div class="pagination-container" *ngIf="totalPages > 1">
       <div class="pagination-info">
-        Mostrando {{ currentPage * pageSize + 1 }} a 
-        {{ getMaxItemsShown() }} de 
+        Mostrando {{ currentPage * pageSize + 1 }} a
+        {{ getMaxItemsShown() }} de
         {{ totalElements }} registros
       </div>
-      
+
       <div class="pagination">
-        <button 
+        <button
           class="pagination-btn"
           [disabled]="currentPage === 0"
           (click)="onPageChange(currentPage - 1)">
           <i class="icon-chevron-left"></i>
         </button>
-        
-        <button 
+
+        <button
           *ngFor="let page of getPages()"
           class="pagination-btn"
           [class.active]="page === currentPage"
           (click)="onPageChange(page)">
           {{ page + 1 }}
         </button>
-        
-        <button 
+
+        <button
           class="pagination-btn"
           [disabled]="currentPage === totalPages - 1"
           (click)="onPageChange(currentPage + 1)">
@@ -264,7 +264,7 @@
         <i class="icon-close"></i>
       </button>
     </div>
-    
+
     <form [formGroup]="createUserForm" (ngSubmit)="onCreateUser()" class="modal-body">
       <div class="form-grid">
         <div class="form-group">
@@ -275,7 +275,7 @@
             formControlName="nombre"
             class="form-control"
             [class.is-invalid]="isFieldInvalid('nombre')"
-            placeholder="Ingresa el nombre">
+            placeholder="Ingrese el nombre">
           <span *ngIf="getFieldError('nombre')" class="form-error">
             {{ getFieldError('nombre') }}
           </span>
@@ -289,7 +289,7 @@
             formControlName="apellido"
             class="form-control"
             [class.is-invalid]="isFieldInvalid('apellido')"
-            placeholder="Ingresa el apellido">
+            placeholder="Ingrese el apellido">
           <span *ngIf="getFieldError('apellido')" class="form-error">
             {{ getFieldError('apellido') }}
           </span>
@@ -303,7 +303,7 @@
             formControlName="email"
             class="form-control"
             [class.is-invalid]="isFieldInvalid('email')"
-            placeholder="usuario@empresa.com">
+            placeholder="Ingrese el correo electrónico">
           <span *ngIf="getFieldError('email')" class="form-error">
             {{ getFieldError('email') }}
           </span>
@@ -317,7 +317,7 @@
             formControlName="dni"
             class="form-control"
             [class.is-invalid]="isFieldInvalid('dni')"
-            placeholder="12345678"
+            placeholder="Ingrese el DNI, pasaporte o C.E."
             maxlength="8">
           <span *ngIf="getFieldError('dni')" class="form-error">
             {{ getFieldError('dni') }}
@@ -332,7 +332,7 @@
             formControlName="cargo"
             class="form-control"
             [class.is-invalid]="isFieldInvalid('cargo')"
-            placeholder="Especialista en Medio Ambiente">
+            placeholder="Ingrese el cargo">
           <span *ngIf="getFieldError('cargo')" class="form-error">
             {{ getFieldError('cargo') }}
           </span>
@@ -371,7 +371,7 @@
         <i class="icon-close"></i>
       </button>
     </div>
-    
+
     <form [formGroup]="editUserForm" (ngSubmit)="onUpdateUser()" class="modal-body">
       <div class="form-grid">
         <div class="form-group">
