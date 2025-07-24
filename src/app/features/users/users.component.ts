@@ -45,14 +45,13 @@ export class UsersComponent implements OnInit {
   
   // Forms
   createUserForm: FormGroup;
+  editUserForm: FormGroup;
   
   // Options  
   statusOptions = [
     { value: '', label: 'Todos los estados' },
     { value: 'ACTIVO', label: 'Activo' },
-    { value: 'INACTIVE', label: 'Inactivo' },
-    { value: 'PENDIENTE', label: 'Pendiente' },
-    { value: 'LOCKED', label: 'Bloqueado' }
+    { value: 'PENDIENTE', label: 'Pendiente' }
   ];
 
   constructor(
@@ -62,6 +61,7 @@ export class UsersComponent implements OnInit {
     private notificationService: NotificationService
   ) {
     this.createUserForm = this.createForm();
+    this.editUserForm = this.createForm();
   }
 
   ngOnInit() {
@@ -98,8 +98,11 @@ export class UsersComponent implements OnInit {
     this.userService.getAllUsers().subscribe({
       next: (response) => {
         if (response.success) {
-          // Filter only firmantes - exclude admins and service accounts
-          const firmantesOnly = response.data.content.filter(user => user.role === 'ROLE_FIRMANTE');
+          // Filter only firmantes (exclude admins and service accounts) and only active/pending status
+          const firmantesOnly = response.data.content.filter(user => {
+            return user.role === 'ROLE_FIRMANTE' && 
+                   (user.status === 'ACTIVO' || user.status === 'PENDIENTE');
+          });
           this.users = firmantesOnly;
           this.totalElements = firmantesOnly.length;
           this.totalPages = Math.ceil(firmantesOnly.length / this.pageSize);
@@ -213,6 +216,12 @@ export class UsersComponent implements OnInit {
     this.createUserForm.reset();
   }
 
+  closeEditModal() {
+    this.showEditModal = false;
+    this.editUserForm.reset();
+    this.selectedUser = null;
+  }
+
   onCreateUser() {
     if (this.createUserForm.invalid) {
       this.markFormGroupTouched(this.createUserForm);
@@ -261,17 +270,71 @@ export class UsersComponent implements OnInit {
     });
   }
 
+  onEditUser(user: User) {
+    this.selectedUser = user;
+    this.showEditModal = true;
+    
+    // Populate the edit form with current user data
+    this.editUserForm.patchValue({
+      nombre: user.nombre,
+      apellido: user.apellido,
+      email: user.email,
+      dni: user.dni,
+      cargo: user.cargo,
+      role: user.role
+    });
+  }
+
+  onUpdateUser() {
+    if (this.editUserForm.invalid || !this.selectedUser) {
+      this.markFormGroupTouched(this.editUserForm);
+      return;
+    }
+
+    const formData = this.editUserForm.value;
+    const request = {
+      id: this.selectedUser.id,
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      email: formData.email,
+      dni: formData.dni,
+      cargo: formData.cargo,
+      role: formData.role
+    };
+    
+    this.userService.updateUser(this.selectedUser.id, request).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.notificationService.success(
+            'Usuario actualizado exitosamente',
+            `${response.data.nombre} ${response.data.apellido} ha sido actualizado.`
+          );
+          this.closeEditModal();
+          // Refresh the user list to show updated data
+          this.loadUsers();
+        } else {
+          this.notificationService.error('Error al actualizar usuario', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error updating user:', error);
+        
+        let errorMessage = 'Error al actualizar el usuario';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        this.notificationService.error('Error al actualizar usuario', errorMessage);
+      }
+    });
+  }
+
   onViewUser(user: User) {
     this.selectedUser = user;
     // TODO: Implementar modal de vista
     console.log('View user:', user);
-  }
-
-  onEditUser(user: User) {
-    this.selectedUser = user;
-    this.showEditModal = true;
-    // TODO: Implementar modal de edición
-    console.log('Edit user:', user);
   }
 
   onDeleteUser(user: User) {
@@ -279,6 +342,7 @@ export class UsersComponent implements OnInit {
       this.userService.deleteUser(user.id).subscribe({
         next: (response) => {
           this.notificationService.success('Usuario eliminado', `${user.nombre} ${user.apellido} ha sido eliminado del sistema.`);
+          // Refresh the user list to show updated data
           this.loadUsers();
         },
         error: (error) => {
@@ -300,6 +364,8 @@ export class UsersComponent implements OnInit {
       this.userService.resendCredentials(request).subscribe({
         next: (response) => {
           this.notificationService.success('Credenciales reenviadas', `Se han enviado las credenciales a ${user.email}`);
+          // Refresh the user list to show any updated status
+          this.loadUsers();
         },
         error: (error) => {
           console.error('Error resending credentials:', error);
@@ -309,30 +375,6 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  onToggleStatus(user: User) {
-    const newStatus = user.status === UserStatus.ACTIVE ? UserStatus.INACTIVE : UserStatus.ACTIVE;
-    const action = newStatus === UserStatus.ACTIVE ? 'activar' : 'desactivar';
-    
-    if (confirm(`¿Está seguro de que desea ${action} al usuario "${user.nombre} ${user.apellido}"?`)) {
-      const serviceMethod = newStatus === UserStatus.ACTIVE 
-        ? this.userService.activateUser(user.id)
-        : this.userService.deactivateUser(user.id);
-        
-      serviceMethod.subscribe({
-        next: (response) => {
-          this.notificationService.success(
-            `Usuario ${action}do`, 
-            `${user.nombre} ${user.apellido} ha sido ${action}do exitosamente.`
-          );
-          this.loadUsers();
-        },
-        error: (error) => {
-          console.error('Error toggling user status:', error);
-          this.notificationService.error(`Error al ${action} usuario`, `No se pudo ${action} el usuario. Inténtelo nuevamente.`);
-        }
-      });
-    }
-  }
 
   getRoleDisplayName(role: string): string {
     switch (role) {
@@ -349,12 +391,8 @@ export class UsersComponent implements OnInit {
     switch (status) {
       case 'ACTIVO':
         return 'Activo';
-      case 'INACTIVE':
-        return 'Inactivo';
       case 'PENDIENTE':
         return 'Pendiente';
-      case 'LOCKED':
-        return 'Bloqueado';
       default:
         return 'Desconocido';
     }
@@ -364,12 +402,8 @@ export class UsersComponent implements OnInit {
     switch (status) {
       case 'ACTIVO':
         return 'badge-success';
-      case 'INACTIVE':
-        return 'badge-error';
       case 'PENDIENTE':
         return 'badge-warning';
-      case 'LOCKED':
-        return 'badge-error';
       default:
         return 'badge-info';
     }
@@ -398,8 +432,9 @@ export class UsersComponent implements OnInit {
     return `${formattedDate} ${formattedTime}`;
   }
 
-  getFieldError(fieldName: string): string | null {
-    const field = this.createUserForm.get(fieldName);
+  getFieldError(fieldName: string, formType: 'create' | 'edit' = 'create'): string | null {
+    const form = formType === 'create' ? this.createUserForm : this.editUserForm;
+    const field = form.get(fieldName);
     if (field && field.errors && field.touched) {
       if (field.errors['required']) {
         return 'Este campo es requerido';
@@ -417,8 +452,9 @@ export class UsersComponent implements OnInit {
     return null;
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.createUserForm.get(fieldName);
+  isFieldInvalid(fieldName: string, formType: 'create' | 'edit' = 'create'): boolean {
+    const form = formType === 'create' ? this.createUserForm : this.editUserForm;
+    const field = form.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 

@@ -69,22 +69,56 @@ interface MenuItem {
       </nav>
 
       <!-- Main Content -->
-      <main class="main-content" [class.sidebar-expanded]="isSidebarExpanded">
-        <ng-content></ng-content>
-      </main>
+      <div class="main-content" [class.sidebar-expanded]="isSidebarExpanded">
+        <header class="main-header">
+          <div class="header-left">
+            <button class="menu-toggle" (click)="toggleSidebar()">
+              <i class="icon-menu"></i>
+            </button>
+            <h1 class="page-title">Sistema de Gestión OEFA</h1>
+          </div>
+          
+          <div class="header-right">
+            <div class="header-actions">
+              <button class="header-action">
+                <i class="icon-bell"></i>
+                <span class="notification-badge">3</span>
+              </button>
+              <button class="header-action">
+                <i class="icon-settings"></i>
+              </button>
+            </div>
+            
+            <div class="user-menu">
+              <div class="user-avatar">
+                <span>{{ getUserInitials() }}</span>
+              </div>
+              <div class="user-details">
+                <span class="user-name">{{ getUserDisplayName() }}</span>
+                <span class="user-role">{{ getRoleDisplayName() }}</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main class="main-body">
+          <ng-content></ng-content>
+        </main>
+      </div>
     </div>
   `,
   styleUrls: ['./layout.component.css']
 })
 export class LayoutComponent implements OnInit {
   currentUser: any = null;
-  isSidebarExpanded = false;
+  isSidebarExpanded = true;
 
   menuItems: MenuItem[] = [
-    { title: 'Dashboard', route: '/dashboard', icon: 'dashboard' },
-    { title: 'Gestión de Firmantes', route: '/users', icon: 'users', roles: ['ROLE_ADMIN'] },
-    { title: 'Documentos Firmados', route: '/signed-documents', icon: 'document' },
-    { title: 'Certificados', route: '/certificates', icon: 'certificate' }
+    { title: 'Panel Principal', route: '/dashboard', icon: 'dashboard', roles: ['ROLE_ADMIN'] },
+    { title: 'Certificados', route: '/certificates', icon: 'certificate', roles: ['ROLE_ADMIN'] },
+    { title: 'Usuarios', route: '/users', icon: 'users', roles: ['ROLE_ADMIN'] },
+    { title: 'Documentos Firmados', route: '/signed-documents', icon: 'document', roles: ['ROLE_ADMIN'] },
+    { title: 'Seguridad', route: '/security', icon: 'shield', roles: ['ROLE_ADMIN'] }
   ];
 
   constructor(private authService: AuthService) {}

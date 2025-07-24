@@ -199,13 +199,6 @@
                 </button>
                 
                 <button 
-                  class="action-btn"
-                  (click)="onToggleStatus(user)"
-                  [title]="user.status === 'ACTIVE' ? 'Desactivar' : 'Activar'">
-                  <i class="icon-toggle"></i>
-                </button>
-                
-                <button 
                   class="action-btn delete"
                   (click)="onDeleteUser(user)"
                   title="Eliminar">
@@ -354,6 +347,113 @@
         </button>
         <button type="submit" class="btn btn-primary" [disabled]="createUserForm.invalid">
           Crear Firmante
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Firmante</h2>
+      <button class="modal-close" (click)="closeEditModal()">
+        <i class="icon-close"></i>
+      </button>
+    </div>
+    
+    <form [formGroup]="editUserForm" (ngSubmit)="onUpdateUser()" class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="editNombre" class="form-label">Nombre *</label>
+          <input
+            id="editNombre"
+            type="text"
+            formControlName="nombre"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('nombre', 'edit')"
+            placeholder="Ingresa el nombre">
+          <span *ngIf="getFieldError('nombre', 'edit')" class="form-error">
+            {{ getFieldError('nombre', 'edit') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="editApellido" class="form-label">Apellido *</label>
+          <input
+            id="editApellido"
+            type="text"
+            formControlName="apellido"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('apellido', 'edit')"
+            placeholder="Ingresa el apellido">
+          <span *ngIf="getFieldError('apellido', 'edit')" class="form-error">
+            {{ getFieldError('apellido', 'edit') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="editEmail" class="form-label">Email *</label>
+          <input
+            id="editEmail"
+            type="email"
+            formControlName="email"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('email', 'edit')"
+            placeholder="usuario@empresa.com">
+          <span *ngIf="getFieldError('email', 'edit')" class="form-error">
+            {{ getFieldError('email', 'edit') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="editDni" class="form-label">DNI *</label>
+          <input
+            id="editDni"
+            type="text"
+            formControlName="dni"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('dni', 'edit')"
+            placeholder="12345678"
+            maxlength="8">
+          <span *ngIf="getFieldError('dni', 'edit')" class="form-error">
+            {{ getFieldError('dni', 'edit') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="editCargo" class="form-label">Cargo *</label>
+          <input
+            id="editCargo"
+            type="text"
+            formControlName="cargo"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('cargo', 'edit')"
+            placeholder="Especialista en Medio Ambiente">
+          <span *ngIf="getFieldError('cargo', 'edit')" class="form-error">
+            {{ getFieldError('cargo', 'edit') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="editRole" class="form-label">Rol *</label>
+          <select
+            id="editRole"
+            formControlName="role"
+            class="form-control">
+            <option value="ROLE_FIRMANTE">Firmante</option>
+            <option value="ROLE_ADMIN">Administrador</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeEditModal()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="editUserForm.invalid">
+          Actualizar Firmante
         </button>
       </div>
     </form>
