@@ -172,23 +172,23 @@
             <h2>Acciones Rápidas</h2>
           </div>
           
-          <div class="actions-grid">
+          <div class="actions-grid" *ngIf="sidebar.currentUser">
             <button class="action-card" routerLink="/certificates">
               <i class="icon-certificate"></i>
               <span>Gestionar Certificados</span>
             </button>
             
-            <button class="action-card" routerLink="/users" *ngIf="currentUser?.role === 'ROLE_ADMIN'">
+            <button class="action-card" routerLink="/users" *ngIf="sidebar.currentUser?.role === 'ROLE_ADMIN'">
               <i class="icon-users"></i>
               <span>Gestionar Usuarios</span>
             </button>
             
-            <button class="action-card" routerLink="/signed-documents" *ngIf="currentUser?.role === 'ROLE_ADMIN'">
+            <button class="action-card" routerLink="/signed-documents" *ngIf="sidebar.currentUser?.role === 'ROLE_ADMIN'">
               <i class="icon-document"></i>
               <span>Documentos Firmados</span>
             </button>
             
-            <button class="action-card" routerLink="/security" *ngIf="currentUser?.role === 'ROLE_ADMIN'">
+            <button class="action-card" routerLink="/security" *ngIf="sidebar.currentUser?.role === 'ROLE_ADMIN'">
               <i class="icon-shield"></i>
               <span>Panel de Seguridad</span>
             </button>
