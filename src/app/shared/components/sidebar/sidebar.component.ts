@@ -23,27 +23,21 @@ export class SidebarComponent implements OnInit {
       roles: ['ROLE_ADMIN']
     },
     {
-      title: 'Certificados',
-      icon: 'certificate',
-      route: '/certificates',
-      roles: ['ROLE_ADMIN']
-    },
-    {
       title: 'Usuarios',
       icon: 'users',
       route: '/users',
       roles: ['ROLE_ADMIN']
     },
     {
-      title: 'Documentos Firmados',
-      icon: 'document',
-      route: '/signed-documents',
+      title: 'Certificados',
+      icon: 'certificate',
+      route: '/certificates',
       roles: ['ROLE_ADMIN']
     },
     {
-      title: 'Seguridad',
-      icon: 'shield',
-      route: '/security',
+      title: 'Documentos Firmados',
+      icon: 'document',
+      route: '/signed-documents',
       roles: ['ROLE_ADMIN']
     }
   ];

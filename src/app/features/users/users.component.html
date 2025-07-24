@@ -340,13 +340,13 @@
 
         <div class="form-group">
           <label for="role" class="form-label">Rol *</label>
-          <select
+          <input
             id="role"
-            formControlName="role"
-            class="form-control">
-            <option value="ROLE_FIRMANTE">Firmante</option>
-            <option value="ROLE_ADMIN">Administrador</option>
-          </select>
+            type="text"
+            value="Firmante"
+            class="form-control form-control-readonly"
+            readonly
+            disabled>
         </div>
       </div>
 

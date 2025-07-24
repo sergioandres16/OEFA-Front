@@ -73,8 +73,7 @@ export class UsersComponent implements OnInit {
       apellido: ['', [Validators.required, Validators.maxLength(100)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
       dni: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
-      cargo: ['', [Validators.required, Validators.maxLength(150)]],
-      role: [UserRole.ROLE_FIRMANTE, [Validators.required]]
+      cargo: ['', [Validators.required, Validators.maxLength(150)]]
     });
   }
 
@@ -202,9 +201,6 @@ export class UsersComponent implements OnInit {
   openCreateModal() {
     this.showCreateModal = true;
     this.createUserForm.reset();
-    this.createUserForm.patchValue({
-      role: UserRole.ROLE_FIRMANTE
-    });
   }
 
   closeCreateModal() {

@@ -594,6 +594,13 @@
   transition: var(--transition);
 }
 
+.form-control-readonly {
+  background-color: var(--gray-100) !important;
+  color: var(--gray-600) !important;
+  cursor: not-allowed !important;
+  border-color: var(--gray-200) !important;
+}
+
 .form-control:focus {
   outline: none;
   border-color: var(--primary-light);
