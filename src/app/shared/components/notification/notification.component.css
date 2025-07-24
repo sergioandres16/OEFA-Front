@@ -1,0 +1,136 @@
+.notification-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notification {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-left: 4px solid;
+  min-width: 350px;
+  max-width: 420px;
+  transform: translateX(100%);
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-success {
+  border-left-color: var(--secondary-teal);
+}
+
+.notification-error {
+  border-left-color: var(--error);
+}
+
+.notification-warning {
+  border-left-color: #f59e0b;
+}
+
+.notification-info {
+  border-left-color: var(--primary);
+}
+
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-success .notification-icon {
+  color: var(--secondary-teal);
+}
+
+.notification-error .notification-icon {
+  color: var(--error);
+}
+
+.notification-warning .notification-icon {
+  color: #f59e0b;
+}
+
+.notification-info .notification-icon {
+  color: var(--primary);
+}
+
+.notification-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: var(--gray-800);
+  font-size: 0.875rem;
+  line-height: 1.25;
+  margin-bottom: 0.25rem;
+}
+
+.notification-message {
+  color: var(--gray-600);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.notification-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.15s ease;
+}
+
+.notification-close:hover {
+  color: var(--gray-600);
+  background: var(--gray-100);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .notification-container {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: none;
+  }
+  
+  .notification {
+    min-width: auto;
+    max-width: none;
+  }
+}

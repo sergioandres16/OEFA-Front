@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { AuthService } from '../../core/services/auth.service';
 import { UserService, CreateFirmanteRequest, UserListParams, PagedResponse } from '../../core/services/user.service';
 import { User, UserRole, UserStatus } from '../../core/models/user.model';
+import { NotificationService } from '../../shared/services/notification.service';
 
 @Component({
   selector: 'app-users',
@@ -61,7 +62,8 @@ export class UsersComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private notificationService: NotificationService
   ) {
     this.createUserForm = this.createForm();
   }
@@ -218,17 +220,32 @@ export class UsersComponent implements OnInit {
     this.userService.createFirmante(request).subscribe({
       next: (response) => {
         if (response.success) {
-          alert(`Usuario creado exitosamente: ${response.message}`);
+          this.notificationService.success(
+            'Usuario creado exitosamente',
+            `${response.data.nombre} ${response.data.apellido} ha sido registrado como firmante.`
+          );
           console.log('Firmante creado:', response.data);
           this.closeCreateModal();
           this.loadUsers();
         } else {
-          alert(`Error: ${response.message}`);
+          this.notificationService.error('Error al crear usuario', response.message);
         }
       },
       error: (error) => {
         console.error('Error creating user:', error);
-        alert('Error al crear el usuario');
+        
+        // Try to extract the API error message
+        let errorMessage = 'Error al crear el usuario';
+        
+        if (error.error && error.error.message) {
+          // API returned error in expected format
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          // HTTP error message
+          errorMessage = error.message;
+        }
+        
+        this.notificationService.error('Error al crear usuario', errorMessage);
       }
     });
   }
@@ -250,12 +267,12 @@ export class UsersComponent implements OnInit {
     if (confirm(`¿Está seguro de que desea eliminar al usuario "${user.nombre} ${user.apellido}"?`)) {
       this.userService.deleteUser(user.id).subscribe({
         next: (response) => {
-          alert('Usuario eliminado exitosamente');
+          this.notificationService.success('Usuario eliminado', `${user.nombre} ${user.apellido} ha sido eliminado del sistema.`);
           this.loadUsers();
         },
         error: (error) => {
           console.error('Error deleting user:', error);
-          alert('Error al eliminar el usuario');
+          this.notificationService.error('Error al eliminar usuario', 'No se pudo eliminar el usuario. Inténtelo nuevamente.');
         }
       });
     }
@@ -271,11 +288,11 @@ export class UsersComponent implements OnInit {
       
       this.userService.resendCredentials(request).subscribe({
         next: (response) => {
-          alert('Credenciales reenviadas exitosamente');
+          this.notificationService.success('Credenciales reenviadas', `Se han enviado las credenciales a ${user.email}`);
         },
         error: (error) => {
           console.error('Error resending credentials:', error);
-          alert('Error al reenviar las credenciales');
+          this.notificationService.error('Error al reenviar credenciales', 'No se pudieron enviar las credenciales. Inténtelo nuevamente.');
         }
       });
     }
@@ -292,12 +309,15 @@ export class UsersComponent implements OnInit {
         
       serviceMethod.subscribe({
         next: (response) => {
-          alert(`Usuario ${action}do exitosamente`);
+          this.notificationService.success(
+            `Usuario ${action}do`, 
+            `${user.nombre} ${user.apellido} ha sido ${action}do exitosamente.`
+          );
           this.loadUsers();
         },
         error: (error) => {
           console.error('Error toggling user status:', error);
-          alert(`Error al ${action} el usuario`);
+          this.notificationService.error(`Error al ${action} usuario`, `No se pudo ${action} el usuario. Inténtelo nuevamente.`);
         }
       });
     }
