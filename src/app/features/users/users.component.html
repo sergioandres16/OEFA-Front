@@ -1,13 +1,13 @@
 <div class="users-container">
   <div class="users-header">
     <div class="header-left">
-      <h1>Gestión de Usuarios</h1>
-      <p>Administra usuarios del sistema de firmas digitales</p>
+      <h1>Gestión de Firmantes</h1>
+      <p>Administra los firmantes del sistema de firmas digitales</p>
     </div>
     <div class="header-actions">
       <button class="btn btn-primary" (click)="openCreateModal()">
         <i class="icon-user-add"></i>
-        Crear Usuario
+        Crear Firmante
       </button>
     </div>
   </div>
@@ -18,44 +18,51 @@
       <div class="filter-group">
         <label for="search">Buscar</label>
         <input
-          id="search"
           type="text"
+          id="search"
+          class="form-control"
           [(ngModel)]="filters.search"
-          (input)="onFilterChange()"
-          placeholder="Buscar por nombre, email o DNI..."
-          class="form-control">
+          (input)="applyFilters()"
+          placeholder="Nombre, email, DNI o cargo...">
       </div>
-
-      <div class="filter-group">
-        <label for="role">Rol</label>
-        <select
-          id="role"
-          [(ngModel)]="filters.role"
-          (change)="onFilterChange()"
-          class="form-control">
-          <option *ngFor="let option of roleOptions" [value]="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </div>
-
+      
       <div class="filter-group">
         <label for="status">Estado</label>
-        <select
-          id="status"
+        <select 
+          id="status" 
+          class="form-control"
           [(ngModel)]="filters.status"
-          (change)="onFilterChange()"
-          class="form-control">
-          <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ option.label }}
+          (change)="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
           </option>
         </select>
       </div>
-
+      
+      <div class="filter-group">
+        <label for="dateFrom">Desde</label>
+        <input
+          type="date"
+          id="dateFrom"
+          class="form-control"
+          [(ngModel)]="filters.dateFrom"
+          (change)="applyFilters()">
+      </div>
+      
+      <div class="filter-group">
+        <label for="dateTo">Hasta</label>
+        <input
+          type="date"
+          id="dateTo"
+          class="form-control"
+          [(ngModel)]="filters.dateTo"
+          (change)="applyFilters()">
+      </div>
+      
       <div class="filter-actions">
-        <button class="btn btn-ghost" (click)="clearFilters()">
-          <i class="icon-clear"></i>
-          Limpiar
+        <button class="btn btn-secondary" (click)="clearFilters()">
+          Limpiar filtros
         </button>
       </div>
     </div>
@@ -65,7 +72,7 @@
   <div class="table-section">
     <div class="table-header">
       <div class="table-info">
-        <span>{{ totalElements }} usuarios encontrados</span>
+        <span>{{ totalElements }} firmantes encontrados</span>
       </div>
       
       <div class="table-actions">
@@ -249,7 +256,7 @@
 <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Crear Nuevo Usuario</h2>
+      <h2>Crear Nuevo Firmante</h2>
       <button class="modal-close" (click)="closeCreateModal()">
         <i class="icon-close"></i>
       </button>
@@ -345,7 +352,7 @@
           Cancelar
         </button>
         <button type="submit" class="btn btn-primary" [disabled]="createUserForm.invalid">
-          Crear Usuario
+          Crear Firmante
         </button>
       </div>
     </form>

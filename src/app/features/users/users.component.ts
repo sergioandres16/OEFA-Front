@@ -21,8 +21,9 @@ export class UsersComponent implements OnInit {
   // Filters
   filters = {
     search: '',
-    role: '',
-    status: ''
+    status: '',
+    dateFrom: '',
+    dateTo: ''
   };
   
   // Pagination
@@ -44,13 +45,7 @@ export class UsersComponent implements OnInit {
   // Forms
   createUserForm: FormGroup;
   
-  // Options
-  roleOptions = [
-    { value: '', label: 'Todos los roles' },
-    { value: UserRole.ROLE_ADMIN, label: 'Administrador' },
-    { value: UserRole.ROLE_FIRMANTE, label: 'Firmante' }
-  ];
-  
+  // Options  
   statusOptions = [
     { value: '', label: 'Todos los estados' },
     { value: UserStatus.ACTIVE, label: 'Activo' },
@@ -102,13 +97,14 @@ export class UsersComponent implements OnInit {
     this.userService.getAllUsers().subscribe({
       next: (response) => {
         if (response.success) {
-          this.users = response.data.content;
-          this.totalElements = response.data.totalElements;
-          this.totalPages = response.data.totalPages;
+          // Filter only firmantes - exclude admins and service accounts
+          const firmantesOnly = response.data.content.filter(user => user.role === 'ROLE_FIRMANTE');
+          this.users = firmantesOnly;
+          this.totalElements = firmantesOnly.length;
+          this.totalPages = Math.ceil(firmantesOnly.length / this.pageSize);
           this.currentPage = response.data.page;
-          this.pageSize = response.data.size;
           this.applyFilters();
-          console.log('Users loaded:', response.data.content);
+          console.log('Firmantes loaded:', firmantesOnly);
         } else {
           console.error('Error in API response:', response.message);
           this.users = [];
@@ -125,16 +121,29 @@ export class UsersComponent implements OnInit {
 
   applyFilters() {
     this.filteredUsers = this.users.filter(user => {
+      // Search filter - now includes cargo
       const matchesSearch = !this.filters.search || 
         user.nombre.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         user.apellido.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         user.email.toLowerCase().includes(this.filters.search.toLowerCase()) ||
-        (user.dni?.includes(this.filters.search) || false);
+        (user.dni?.includes(this.filters.search) || false) ||
+        (user.cargo?.toLowerCase().includes(this.filters.search.toLowerCase()) || false);
       
-      const matchesRole = !this.filters.role || user.role === this.filters.role;
+      // Status filter
       const matchesStatus = !this.filters.status || user.status === this.filters.status;
       
-      return matchesSearch && matchesRole && matchesStatus;
+      // Date range filter
+      let matchesDateRange = true;
+      if (this.filters.dateFrom || this.filters.dateTo) {
+        const userDate = new Date(user.createdAt!);
+        const fromDate = this.filters.dateFrom ? new Date(this.filters.dateFrom) : null;
+        const toDate = this.filters.dateTo ? new Date(this.filters.dateTo + 'T23:59:59') : null;
+        
+        if (fromDate && userDate < fromDate) matchesDateRange = false;
+        if (toDate && userDate > toDate) matchesDateRange = false;
+      }
+      
+      return matchesSearch && matchesStatus && matchesDateRange;
     });
   }
 
@@ -145,8 +154,9 @@ export class UsersComponent implements OnInit {
   clearFilters() {
     this.filters = {
       search: '',
-      role: '',
-      status: ''
+      status: '',
+      dateFrom: '',
+      dateTo: ''
     };
     this.applyFilters();
   }
