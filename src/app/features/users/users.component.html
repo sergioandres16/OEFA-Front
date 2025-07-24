@@ -13,25 +13,10 @@
       </div>
       
       <div class="header-right">
-        <div class="header-actions">
-          <button class="header-action">
-            <i class="icon-bell"></i>
-            <span class="notification-badge">3</span>
-          </button>
-          <button class="header-action">
-            <i class="icon-settings"></i>
-          </button>
-        </div>
-        
-        <div class="user-menu">
-          <div class="user-avatar">
-            <span>{{ sidebar.getUserInitials() }}</span>
-          </div>
-          <div class="user-details">
-            <span class="user-name">{{ sidebar.getUserDisplayName() }}</span>
-            <span class="user-role">{{ sidebar.getRoleDisplayName() }}</span>
-          </div>
-        </div>
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          <i class="icon-user-add"></i>
+          Crear Firmante
+        </button>
       </div>
     </header>
 
@@ -41,13 +26,7 @@
           <div class="header-left">
             <p>Administra los firmantes del sistema de firmas digitales</p>
           </div>
-    <div class="header-actions">
-      <button class="btn btn-primary" (click)="openCreateModal()">
-        <i class="icon-user-add"></i>
-        Crear Firmante
-      </button>
-    </div>
-  </div>
+        </div>
 
   <!-- Filters Section -->
   <div class="filters-section">
