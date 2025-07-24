@@ -32,6 +32,21 @@ export interface CreateFirmanteResponse {
   data: CreateFirmanteData;
 }
 
+export interface GetUsersResponse {
+  success: boolean;
+  message: string;
+  data: {
+    content: User[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    first: boolean;
+    last: boolean;
+    empty: boolean;
+  };
+}
+
 export interface ResendCredentialsRequest {
   email: string;
   dni?: string | null;
@@ -79,6 +94,22 @@ export class UserService {
   /**
    * List all users with pagination and filters (Admin only)
    */
+  /**
+   * Get all users (Admin only)
+   */
+  getAllUsers(): Observable<GetUsersResponse> {
+    this.isLoadingSubject.next(true);
+    
+    return this.http.get<GetUsersResponse>(`${this.API_URL}/admin/users`)
+      .pipe(
+        tap(() => this.isLoadingSubject.next(false)),
+        catchError(error => {
+          this.isLoadingSubject.next(false);
+          throw error;
+        })
+      );
+  }
+
   listUsers(params?: UserListParams): Observable<PagedResponse<User>> {
     this.isLoadingSubject.next(true);
     

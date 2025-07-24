@@ -96,35 +96,29 @@ export class UsersComponent implements OnInit {
       email: this.filters.search
     };
 
-    // Use mock service for development - replace with real API call
-    this.userService.listUsersMock(params).subscribe({
-      next: (response: PagedResponse<User>) => {
-        this.users = response.content;
-        this.totalElements = response.totalElements;
-        this.totalPages = response.totalPages;
-        this.applyFilters();
+    // Use real API to get all users
+    this.userService.getAllUsers().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.users = response.data.content;
+          this.totalElements = response.data.totalElements;
+          this.totalPages = response.data.totalPages;
+          this.currentPage = response.data.page;
+          this.pageSize = response.data.size;
+          this.applyFilters();
+          console.log('Users loaded:', response.data.content);
+        } else {
+          console.error('Error in API response:', response.message);
+          this.users = [];
+        }
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading users:', error);
+        this.users = [];
         this.isLoading = false;
       }
     });
-    
-    // TODO: Replace with real API call when available
-    // this.userService.listUsers(params).subscribe({
-    //   next: (response: PagedResponse<User>) => {
-    //     this.users = response.content;
-    //     this.totalElements = response.totalElements;
-    //     this.totalPages = response.totalPages;
-    //     this.applyFilters();
-    //     this.isLoading = false;
-    //   },
-    //   error: (error) => {
-    //     console.error('Error loading users:', error);
-    //     this.isLoading = false;
-    //   }
-    // });
   }
 
   applyFilters() {
