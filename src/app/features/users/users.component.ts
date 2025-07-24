@@ -5,11 +5,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { UserService, CreateFirmanteRequest, UserListParams, PagedResponse } from '../../core/services/user.service';
 import { User, UserRole, UserStatus } from '../../core/models/user.model';
 import { NotificationService } from '../../shared/services/notification.service';
+import { LayoutComponent } from '../../shared/components/layout/layout.component';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LayoutComponent],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
@@ -48,10 +49,10 @@ export class UsersComponent implements OnInit {
   // Options  
   statusOptions = [
     { value: '', label: 'Todos los estados' },
-    { value: UserStatus.ACTIVE, label: 'Activo' },
-    { value: UserStatus.INACTIVE, label: 'Inactivo' },
-    { value: UserStatus.PENDING, label: 'Pendiente' },
-    { value: UserStatus.LOCKED, label: 'Bloqueado' }
+    { value: 'ACTIVO', label: 'Activo' },
+    { value: 'INACTIVE', label: 'Inactivo' },
+    { value: 'PENDIENTE', label: 'Pendiente' },
+    { value: 'LOCKED', label: 'Bloqueado' }
   ];
 
   constructor(

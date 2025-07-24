@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SignedDocumentsService, SignedDocument, SignedDocumentListParams } from '../../core/services/signed-documents.service';
+import { LayoutComponent } from '../../shared/components/layout/layout.component';
 
 @Component({
   selector: 'app-signed-documents',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LayoutComponent],
   templateUrl: './signed-documents.component.html',
   styleUrls: ['./signed-documents.component.css']
 })

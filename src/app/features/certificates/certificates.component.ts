@@ -5,11 +5,12 @@ import { CertificateV2Service } from '../../core/services/certificate-v2.service
 import { AuthService } from '../../core/services/auth.service';
 import { Certificate, CertificateStatus } from '../../core/models/certificate-v2.model';
 import { User } from '../../core/models/user.model';
+import { LayoutComponent } from '../../shared/components/layout/layout.component';
 
 @Component({
   selector: 'app-certificates',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LayoutComponent],
   templateUrl: './certificates.component.html',
   styleUrls: ['./certificates.component.css']
 })
