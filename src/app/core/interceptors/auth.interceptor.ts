@@ -23,6 +23,16 @@ export function authInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obs
       console.log('Auth Interceptor - Added Authorization header');
       console.log('Auth Interceptor - Headers after clone:', authReq.headers.get('Authorization'));
       console.log('Auth Interceptor - Token preview:', token.substring(0, 20) + '...');
+      
+      // Logging adicional para requests de certificates
+      if (req.url.includes('/certificates/')) {
+        console.log('=== CERTIFICATE REQUEST DETAILS ===');
+        console.log('Full URL:', req.url);
+        console.log('Method:', req.method);
+        console.log('All Headers:', authReq.headers.keys().map(key => `${key}: ${authReq.headers.get(key)}`));
+        console.log('Full Token:', token);
+        console.log('==================================');
+      }
     } else {
       console.log('Auth Interceptor - No token available');
     }
@@ -32,6 +42,18 @@ export function authInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obs
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
+      // Logging detallado para errores 401
+      if (error.status === 401) {
+        console.log('=== 401 ERROR DETAILS ===');
+        console.log('URL:', req.url);
+        console.log('Method:', req.method);
+        console.log('Error Status:', error.status);
+        console.log('Error Message:', error.message);
+        console.log('Error Body:', error.error);
+        console.log('Request Headers:', authReq.headers.keys().map(key => `${key}: ${authReq.headers.get(key)}`));
+        console.log('========================');
+      }
+      
       if (error.status === 401 && !isLoginRequest) {
         return handle401Error(authReq, next, authService);
       }

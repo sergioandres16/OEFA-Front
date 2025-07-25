@@ -110,7 +110,21 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = localStorage.getItem('accessToken');
-    return !!token && !this.isTokenExpired(token);
+    if (!token) {
+      console.log('AuthService.isAuthenticated() - No token found');
+      return false;
+    }
+    
+    const isExpired = this.isTokenExpired(token);
+    const isAuthenticated = !isExpired;
+    
+    console.log('AuthService.isAuthenticated() - Result:', {
+      hasToken: !!token,
+      isExpired,
+      isAuthenticated
+    });
+    
+    return isAuthenticated;
   }
 
   isAdmin(): boolean {
@@ -134,6 +148,29 @@ export class AuthService {
       console.log('Token preview:', token.substring(0, 20) + '...');
     }
     return token;
+  }
+
+  // Método para depurar el estado de autenticación
+  debugAuthState(): void {
+    const token = localStorage.getItem('accessToken');
+    const user = this.getCurrentUser();
+    
+    console.log('=== AUTH DEBUG STATE ===');
+    console.log('Token exists:', !!token);
+    console.log('Current user:', user);
+    console.log('Is authenticated:', this.isAuthenticated());
+    console.log('Is admin:', this.isAdmin());
+    console.log('Is firmante:', this.isFirmante());
+    
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Token payload:', payload);
+      } catch (error) {
+        console.log('Error parsing token:', error);
+      }
+    }
+    console.log('========================');
   }
 
   createFirmante(firmanteData: any): Observable<any> {
@@ -185,12 +222,20 @@ export class AuthService {
   private isTokenExpired(token: string): boolean {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
+      
+      // Si el token no tiene campo exp, considerarlo como válido (no expira)
+      if (!payload.exp) {
+        console.log('Token without expiration field - treating as valid');
+        return false;
+      }
+      
       const expiry = payload.exp * 1000;
       const isExpired = Date.now() > expiry;
       console.log('Token expiry check:', {
         expires: new Date(expiry),
         now: new Date(),
-        isExpired
+        isExpired,
+        hasExp: !!payload.exp
       });
       return isExpired;
     } catch (error) {
