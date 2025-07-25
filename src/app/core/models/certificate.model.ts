@@ -1,27 +1,24 @@
 export interface Certificate {
   id: number;
   userId: number;
-  fileName: string;
-  fileSize: number;
-  uploadedAt: Date;
-  validFrom: Date;
-  validTo: Date;
-  issuer: string;
-  subject: string;
-  serialNumber: string;
+  fileUuid: string;
   status: CertificateStatus;
-  algorithm: string;
-  keySize: number;
-  isValid: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  validationMessage: string;
+  subjectCN: string | null;
+  issuerCN: string | null;
+  serialNumber: string | null;
+  validFrom: string | null;
+  validTo: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export enum CertificateStatus {
   ACTIVE = 'ACTIVE',
   EXPIRED = 'EXPIRED',
   REVOKED = 'REVOKED',
-  PENDING = 'PENDING'
+  PENDING = 'PENDING',
+  INVALIDO = 'INVALIDO'
 }
 
 export interface CertificateUploadRequest {

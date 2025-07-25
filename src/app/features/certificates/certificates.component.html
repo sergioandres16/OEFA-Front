@@ -143,17 +143,17 @@
                       <span class="checkbox-custom"></span>
                     </label>
                   </th>
-                  <th class="sortable" (click)="onSort('fileName')">
-                    Archivo
-                    <span class="sort-icon">{{ getSortIcon('fileName') }}</span>
+                  <th class="sortable" (click)="onSort('fileUuid')">
+                    UUID del Archivo
+                    <span class="sort-icon">{{ getSortIcon('fileUuid') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('subject')">
+                  <th class="sortable" (click)="onSort('subjectCN')">
                     Sujeto
-                    <span class="sort-icon">{{ getSortIcon('subject') }}</span>
+                    <span class="sort-icon">{{ getSortIcon('subjectCN') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('issuer')">
+                  <th class="sortable" (click)="onSort('issuerCN')">
                     Emisor
-                    <span class="sort-icon">{{ getSortIcon('issuer') }}</span>
+                    <span class="sort-icon">{{ getSortIcon('issuerCN') }}</span>
                   </th>
                   <th class="sortable" (click)="onSort('status')">
                     Estado
@@ -163,9 +163,9 @@
                     Expira
                     <span class="sort-icon">{{ getSortIcon('validTo') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('uploadedAt')">
-                    Subido
-                    <span class="sort-icon">{{ getSortIcon('uploadedAt') }}</span>
+                  <th class="sortable" (click)="onSort('createdAt')">
+                    Creación
+                    <span class="sort-icon">{{ getSortIcon('createdAt') }}</span>
                   </th>
                   <th class="actions-col">Acciones</th>
                 </tr>
@@ -204,18 +204,17 @@
                   </td>
                   <td>
                     <div class="file-info">
-                      <div class="file-name">{{ certificate.fileName }}</div>
-                      <div class="file-size">{{ formatFileSize(certificate.fileSize) }}</div>
+                      <div class="file-name">{{ certificate.fileUuid }}</div>
                     </div>
                   </td>
                   <td>
                     <div class="subject-info">
-                      <div class="subject-name">{{ certificate.subject || 'N/A' }}</div>
+                      <div class="subject-name">{{ certificate.subjectCN || 'N/A' }}</div>
                       <div class="serial-number">{{ certificate.serialNumber || 'N/A' }}</div>
                     </div>
                   </td>
                   <td>
-                    <div class="issuer-info">{{ certificate.issuer || 'N/A' }}</div>
+                    <div class="issuer-info">{{ certificate.issuerCN || 'N/A' }}</div>
                   </td>
                   <td>
                     <span class="badge" [class]="getStatusBadgeClass(certificate.status)">
@@ -233,7 +232,7 @@
                     </div>
                   </td>
                   <td>
-                    <div class="date">{{ formatDate(certificate.uploadedAt!) }}</div>
+                    <div class="date">{{ formatDate(certificate.createdAt!) }}</div>
                   </td>
                   <td>
                     <div class="actions">
