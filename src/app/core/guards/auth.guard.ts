@@ -21,7 +21,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.router.navigate(['/login'], { 
+    this.router.navigate(['/admin/login'], { 
       queryParams: { returnUrl: state.url }
     });
     return false;
@@ -49,7 +49,7 @@ export class AdminGuard implements CanActivate {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
     } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/admin/login']);
     }
     
     return false;
@@ -77,7 +77,7 @@ export class FirmanteGuard implements CanActivate {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
     } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/admin/login']);
     }
     
     return false;

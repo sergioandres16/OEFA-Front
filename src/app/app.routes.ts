@@ -34,7 +34,7 @@ export const routes: Routes = [
   {
     path: 'certificates',
     loadComponent: () => import('./features/certificates/certificates.component').then(c => c.CertificatesComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AdminGuard]
   },
   {
     path: 'users',
