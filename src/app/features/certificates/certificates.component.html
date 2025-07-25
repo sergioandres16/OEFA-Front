@@ -10,14 +10,9 @@
           <i class="icon-menu"></i>
         </button>
         <h1 class="page-title">Gestión de Certificados</h1>
-        <p class="page-subtitle">Administra los certificados digitales del sistema</p>
       </div>
-      
-      <div class="header-actions">
-        <button class="btn btn-outline" (click)="showFilters = !showFilters">
-          <i class="icon-filter"></i>
-          Filtros
-        </button>
+
+      <div class="header-right">
         <button class="btn btn-primary" (click)="onUploadCertificate()">
           <i class="icon-upload"></i>
           Subir Certificado
@@ -28,7 +23,7 @@
     <main class="main-body">
       <div class="certificates-container">
         <!-- Filters Section -->
-        <div class="filters-section" [class.expanded]="showFilters">
+        <div class="filters-section">
           <div class="filters-grid">
             <div class="filter-group">
               <label for="search">Buscar</label>
@@ -86,9 +81,8 @@
             </div>
 
             <div class="filter-actions">
-              <button class="btn btn-ghost" (click)="clearFilters()">
-                <i class="icon-clear"></i>
-                Limpiar
+              <button class="btn btn-secondary" (click)="clearFilters()">
+                Limpiar filtros
               </button>
             </div>
           </div>

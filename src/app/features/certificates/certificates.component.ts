@@ -43,7 +43,6 @@ export class CertificatesComponent implements OnInit {
   // UI State
   isLoading = false;
   selectedCertificates: Set<number> = new Set();
-  showFilters = false;
   
   // Status options
   statusOptions = [
