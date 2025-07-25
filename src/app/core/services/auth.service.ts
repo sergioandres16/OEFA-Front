@@ -128,7 +128,12 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
+    console.log('AuthService.getToken() called, token exists:', !!token);
+    if (token) {
+      console.log('Token preview:', token.substring(0, 20) + '...');
+    }
+    return token;
   }
 
   createFirmante(firmanteData: any): Observable<any> {
@@ -181,8 +186,15 @@ export class AuthService {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const expiry = payload.exp * 1000;
-      return Date.now() > expiry;
-    } catch {
+      const isExpired = Date.now() > expiry;
+      console.log('Token expiry check:', {
+        expires: new Date(expiry),
+        now: new Date(),
+        isExpired
+      });
+      return isExpired;
+    } catch (error) {
+      console.error('Error parsing token:', error);
       return true;
     }
   }

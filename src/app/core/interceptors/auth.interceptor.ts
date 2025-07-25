@@ -21,6 +21,8 @@ export function authInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obs
         }
       });
       console.log('Auth Interceptor - Added Authorization header');
+      console.log('Auth Interceptor - Headers after clone:', authReq.headers.get('Authorization'));
+      console.log('Auth Interceptor - Token preview:', token.substring(0, 20) + '...');
     } else {
       console.log('Auth Interceptor - No token available');
     }
