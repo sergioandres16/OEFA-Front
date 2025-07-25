@@ -10,10 +10,15 @@
           <i class="icon-menu"></i>
         </button>
         <h1 class="page-title">Gestión de Certificados</h1>
+        <p class="page-subtitle">Administra los certificados digitales del sistema</p>
       </div>
       
-      <div class="header-right">
-        <button class="btn btn-primary" (click)="openUploadModal()">
+      <div class="header-actions">
+        <button class="btn btn-outline" (click)="showFilters = !showFilters">
+          <i class="icon-filter"></i>
+          Filtros
+        </button>
+        <button class="btn btn-primary" (click)="onUploadCertificate()">
           <i class="icon-upload"></i>
           Subir Certificado
         </button>
@@ -21,72 +26,69 @@
     </header>
 
     <main class="main-body">
-      <div class="users-container">
+      <div class="certificates-container">
         <!-- Filters Section -->
-        <div class="filters-section">
+        <div class="filters-section" [class.expanded]="showFilters">
           <div class="filters-grid">
             <div class="filter-group">
               <label for="search">Buscar</label>
               <input
-                type="text"
                 id="search"
-                class="form-control"
+                type="text"
                 [(ngModel)]="filters.search"
-                (input)="applyFilters()"
-                placeholder="Nombre archivo, sujeto, emisor, serie...">
+                (input)="onFilterChange()"
+                placeholder="Buscar por nombre, sujeto o emisor..."
+                class="form-control">
             </div>
-            
+
             <div class="filter-group">
               <label for="status">Estado</label>
-              <select 
-                id="status" 
-                class="form-control"
+              <select
+                id="status"
                 [(ngModel)]="filters.status"
-                (change)="applyFilters()">
-                <option value="">Todos los estados</option>
-                <option *ngFor="let status of statusOptions" [value]="status.value">
-                  {{ status.label }}
+                (change)="onFilterChange()"
+                class="form-control">
+                <option *ngFor="let option of statusOptions" [value]="option.value">
+                  {{ option.label }}
                 </option>
               </select>
             </div>
-            
+
             <div class="filter-group">
-              <label for="userId">Usuario</label>
-              <select 
-                id="userId" 
-                class="form-control"
-                [(ngModel)]="filters.userId"
-                (change)="applyFilters()">
-                <option value="">Todos los usuarios</option>
-                <option *ngFor="let user of users" [value]="user.id">
-                  {{ user.nombre }} {{ user.apellido }}
-                </option>
-              </select>
+              <label for="issuer">Emisor</label>
+              <input
+                id="issuer"
+                type="text"
+                [(ngModel)]="filters.issuer"
+                (input)="onFilterChange()"
+                placeholder="Filtrar por emisor..."
+                class="form-control">
             </div>
-            
+
             <div class="filter-group">
               <label for="dateFrom">Desde</label>
               <input
-                type="date"
                 id="dateFrom"
-                class="form-control"
+                type="date"
                 [(ngModel)]="filters.dateFrom"
-                (change)="applyFilters()">
+                (change)="onFilterChange()"
+                class="form-control">
             </div>
-            
+
             <div class="filter-group">
               <label for="dateTo">Hasta</label>
               <input
-                type="date"
                 id="dateTo"
-                class="form-control"
+                type="date"
                 [(ngModel)]="filters.dateTo"
-                (change)="applyFilters()">
+                (change)="onFilterChange()"
+                class="form-control">
             </div>
-            
+
             <div class="filter-actions">
-              <button class="btn btn-secondary" (click)="clearFilters()">
-                Limpiar filtros
+              <button class="btn btn-ghost" (click)="clearFilters()">
+                <i class="icon-clear"></i>
+                Limpiar
               </button>
             </div>
           </div>
@@ -97,9 +99,20 @@
           <div class="table-header">
             <div class="table-info">
               <span>{{ totalElements }} certificados encontrados</span>
+              <span *ngIf="selectedCertificates.size > 0" class="selected-count">
+                {{ selectedCertificates.size }} seleccionados
+              </span>
             </div>
             
             <div class="table-actions">
+              <button 
+                *ngIf="selectedCertificates.size > 0"
+                class="btn btn-outline btn-sm"
+                (click)="onBulkDelete()">
+                <i class="icon-delete"></i>
+                Eliminar Seleccionados
+              </button>
+              
               <div class="page-size-selector">
                 <label for="pageSize">Mostrar:</label>
                 <select 
@@ -110,6 +123,7 @@
                   <option value="10">10</option>
                   <option value="25">25</option>
                   <option value="50">50</option>
+                  <option value="100">100</option>
                 </select>
               </div>
             </div>
@@ -119,24 +133,38 @@
             <table class="table">
               <thead>
                 <tr>
+                  <th class="checkbox-col">
+                    <label class="checkbox-label">
+                      <input
+                        type="checkbox"
+                        [checked]="isAllSelected()"
+                        (change)="selectAllCertificates()"
+                        class="checkbox-input">
+                      <span class="checkbox-custom"></span>
+                    </label>
+                  </th>
                   <th class="sortable" (click)="onSort('fileName')">
                     Archivo
                     <span class="sort-icon">{{ getSortIcon('fileName') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('userId')">
-                    Usuario
-                    <span class="sort-icon">{{ getSortIcon('userId') }}</span>
+                  <th class="sortable" (click)="onSort('subject')">
+                    Sujeto
+                    <span class="sort-icon">{{ getSortIcon('subject') }}</span>
+                  </th>
+                  <th class="sortable" (click)="onSort('issuer')">
+                    Emisor
+                    <span class="sort-icon">{{ getSortIcon('issuer') }}</span>
                   </th>
                   <th class="sortable" (click)="onSort('status')">
                     Estado
                     <span class="sort-icon">{{ getSortIcon('status') }}</span>
                   </th>
                   <th class="sortable" (click)="onSort('validTo')">
-                    Vence
+                    Expira
                     <span class="sort-icon">{{ getSortIcon('validTo') }}</span>
                   </th>
                   <th class="sortable" (click)="onSort('uploadedAt')">
-                    Fecha de Subida
+                    Subido
                     <span class="sort-icon">{{ getSortIcon('uploadedAt') }}</span>
                   </th>
                   <th class="actions-col">Acciones</th>
@@ -144,7 +172,7 @@
               </thead>
               <tbody>
                 <tr *ngIf="isLoading" class="loading-row">
-                  <td colspan="6" class="text-center">
+                  <td colspan="8" class="text-center">
                     <div class="loading-spinner">
                       <div class="loading"></div>
                       <span>Cargando certificados...</span>
@@ -153,7 +181,7 @@
                 </tr>
                 
                 <tr *ngIf="!isLoading && filteredCertificates.length === 0" class="empty-row">
-                  <td colspan="6" class="text-center">
+                  <td colspan="8" class="text-center">
                     <div class="empty-state">
                       <i class="icon-empty"></i>
                       <h3>No se encontraron certificados</h3>
@@ -162,7 +190,18 @@
                   </td>
                 </tr>
                 
-                <tr *ngFor="let certificate of filteredCertificates" class="user-row">
+                <tr *ngFor="let certificate of filteredCertificates; trackBy: trackByCertificate" 
+                    class="certificate-row">
+                  <td>
+                    <label class="checkbox-label">
+                      <input
+                        type="checkbox"
+                        [checked]="selectedCertificates.has(certificate.id)"
+                        (change)="toggleCertificateSelection(certificate.id)"
+                        class="checkbox-input">
+                      <span class="checkbox-custom"></span>
+                    </label>
+                  </td>
                   <td>
                     <div class="file-info">
                       <div class="file-name">{{ certificate.fileName }}</div>
@@ -170,18 +209,31 @@
                     </div>
                   </td>
                   <td>
-                    <div class="user-info">{{ getUserName(certificate.userId) }}</div>
+                    <div class="subject-info">
+                      <div class="subject-name">{{ certificate.subject || 'N/A' }}</div>
+                      <div class="serial-number">{{ certificate.serialNumber || 'N/A' }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="issuer-info">{{ certificate.issuer || 'N/A' }}</div>
                   </td>
                   <td>
                     <span class="badge" [class]="getStatusBadgeClass(certificate.status)">
-                      {{ getStatusDisplayName(certificate.status) }}
+                      {{ getStatusText(certificate.status) }}
                     </span>
                   </td>
                   <td>
-                    <div class="date">{{ formatDateTime(certificate.validTo!) }}</div>
+                    <div class="date-info">
+                      <div class="date">{{ formatDate(certificate.validTo!) }}</div>
+                      <div class="days-left" 
+                           [class.expiring]="isExpiringSoon(certificate.validTo!)"
+                           [class.expired]="isExpired(certificate.validTo!)">
+                        {{ getDaysUntilExpiration(certificate.validTo!) }}
+                      </div>
+                    </div>
                   </td>
                   <td>
-                    <div class="date">{{ formatDateTime(certificate.uploadedAt!) }}</div>
+                    <div class="date">{{ formatDate(certificate.uploadedAt!) }}</div>
                   </td>
                   <td>
                     <div class="actions">
@@ -190,6 +242,20 @@
                         (click)="onViewCertificate(certificate)"
                         title="Ver detalles">
                         <i class="icon-eye"></i>
+                      </button>
+                      
+                      <button 
+                        class="action-btn"
+                        (click)="onEditCertificate(certificate)"
+                        title="Editar">
+                        <i class="icon-edit"></i>
+                      </button>
+                      
+                      <button 
+                        class="action-btn"
+                        (click)="onValidateCertificate(certificate)"
+                        title="Validar">
+                        <i class="icon-shield"></i>
                       </button>
                       
                       <button 
@@ -253,7 +319,7 @@
       </button>
     </div>
     
-    <form [formGroup]="uploadForm" (ngSubmit)="onUploadCertificate()" class="modal-body">
+    <form [formGroup]="uploadForm" (ngSubmit)="onUploadSubmit()" class="modal-body">
       <div class="form-grid">
         <div class="form-group">
           <label for="userId" class="form-label">Usuario *</label>
@@ -311,5 +377,31 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Confirmar Eliminación</h2>
+      <button class="modal-close" (click)="cancelDelete()">
+        <i class="icon-close"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <p>¿Está seguro de que desea eliminar el certificado "{{ certificateToDelete?.fileName }}"?</p>
+      <p class="text-warning">Esta acción no se puede deshacer.</p>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" (click)="cancelDelete()">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-danger" (click)="onDeleteCertificate()">
+          Eliminar
+        </button>
+      </div>
+    </div>
   </div>
 </div>
