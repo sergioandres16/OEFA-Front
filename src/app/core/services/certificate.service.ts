@@ -13,7 +13,7 @@ export class CertificateService {
   constructor(private http: HttpClient) {}
 
   getAllCertificates(): Observable<ApiResponse<PagedResponse<Certificate>>> {
-    return this.http.get<ApiResponse<PagedResponse<Certificate>>>(`${this.API_URL}`);
+    return this.http.get<ApiResponse<PagedResponse<Certificate>>>(`${this.API_URL}/list`);
   }
 
   getCertificateById(id: number): Observable<ApiResponse<Certificate>> {

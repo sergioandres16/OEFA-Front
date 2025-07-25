@@ -73,7 +73,7 @@ export class CertificatesComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadCertificates();
+    // this.loadCertificates();
     this.loadUsers();
   }
 
