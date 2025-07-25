@@ -352,6 +352,7 @@ export class UsersComponent implements OnInit {
     this.userService.updateUser(this.selectedUser.id, updateData).subscribe({
       next: (response) => {
         if (response.success) {
+          console.log('Showing success notification');
           this.notificationService.success(
             'Firmante actualizado exitosamente',
             `Los datos del firmante han sido actualizados correctamente.`
@@ -381,7 +382,7 @@ export class UsersComponent implements OnInit {
     // Get full user details from API
     this.userService.getUserById(user.id).subscribe({
       next: (response) => {
-        if (response.success) {
+        if (response.success && response.data) {
           this.selectedUser = response.data;
           this.showViewModal = true;
         } else {

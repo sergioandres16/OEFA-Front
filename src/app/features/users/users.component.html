@@ -483,8 +483,8 @@
           </div>
           <div class="detail-row">
             <label>Estado:</label>
-            <span class="status-badge" [class]="selectedUser.status?.toLowerCase()">
-              {{ getStatusText(selectedUser.status!) }}
+            <span class="status-badge" [class]="selectedUser.status.toLowerCase()">
+              {{ getStatusText(selectedUser.status) }}
             </span>
           </div>
           <div class="detail-row" *ngIf="selectedUser.createdAt">
