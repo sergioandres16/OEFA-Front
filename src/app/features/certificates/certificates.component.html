@@ -23,70 +23,71 @@
     <main class="main-body">
       <div class="certificates-container">
         <!-- Filters Section -->
-        <div class="filters-section">
-          <div class="filters-grid">
-            <div class="filter-group">
-              <label for="search">Buscar</label>
-              <input
-                id="search"
-                type="text"
-                [(ngModel)]="filters.search"
-                (input)="onFilterChange()"
-                placeholder="Buscar por nombre, sujeto o emisor..."
-                class="form-control">
-            </div>
+  <div class="filters-section">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="search">Buscar</label>
+        <input
+          type="text"
+          id="search"
+          class="form-control"
+          [(ngModel)]="filters.search"
+          (input)="onFilterChange()"
+          placeholder="Nombre, sujeto, emisor o serial...">
+      </div>
 
-            <div class="filter-group">
-              <label for="status">Estado</label>
-              <select
-                id="status"
-                [(ngModel)]="filters.status"
-                (change)="onFilterChange()"
-                class="form-control">
-                <option *ngFor="let option of statusOptions" [value]="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
+      <div class="filter-group">
+        <label for="status">Estado</label>
+        <select
+          id="status"
+          class="form-control"
+          [(ngModel)]="filters.status"
+          (change)="onFilterChange()">
+          <option value="">Todos los estados</option>
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
 
-            <div class="filter-group">
-              <label for="issuer">Emisor</label>
-              <input
-                id="issuer"
-                type="text"
-                [(ngModel)]="filters.issuer"
-                (input)="onFilterChange()"
-                placeholder="Filtrar por emisor..."
-                class="form-control">
-            </div>
+      <div class="filter-group">
+        <label for="issuer">Emisor</label>
+        <input
+          type="text"
+          id="issuer"
+          class="form-control"
+          [(ngModel)]="filters.issuer"
+          (input)="onFilterChange()"
+          placeholder="Filtrar por emisor...">
+      </div>
 
-            <div class="filter-group">
-              <label for="dateFrom">Desde</label>
-              <input
-                id="dateFrom"
-                type="date"
-                [(ngModel)]="filters.dateFrom"
-                (change)="onFilterChange()"
-                class="form-control">
-            </div>
+      <div class="filter-group">
+        <label for="dateFrom">Desde</label>
+        <input
+          type="date"
+          id="dateFrom"
+          class="form-control"
+          [(ngModel)]="filters.dateFrom"
+          (change)="onFilterChange()">
+      </div>
 
-            <div class="filter-group">
-              <label for="dateTo">Hasta</label>
-              <input
-                id="dateTo"
-                type="date"
-                [(ngModel)]="filters.dateTo"
-                (change)="onFilterChange()"
-                class="form-control">
-            </div>
+      <div class="filter-group">
+        <label for="dateTo">Hasta</label>
+        <input
+          type="date"
+          id="dateTo"
+          class="form-control"
+          [(ngModel)]="filters.dateTo"
+          (change)="onFilterChange()">
+      </div>
 
-            <div class="filter-actions">
-              <button class="btn btn-secondary" (click)="clearFilters()">
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
-        </div>
+      <div class="filter-actions">
+        <button class="btn btn-secondary" (click)="clearFilters()">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  </div>
 
         <!-- Table Section -->
         <div class="table-section">
