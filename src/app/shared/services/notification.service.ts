@@ -29,8 +29,6 @@ export class NotificationService {
     };
 
     this.notifications.push(notification);
-    console.log('Notification added:', notification);
-    console.log('Total notifications:', this.notifications.length);
 
     // Auto remove notification after duration
     if (duration > 0) {

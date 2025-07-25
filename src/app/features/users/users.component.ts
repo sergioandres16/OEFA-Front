@@ -42,7 +42,9 @@ export class UsersComponent implements OnInit {
   showCreateModal = false;
   showEditModal = false;
   showViewModal = false;
+  showDeleteModal = false;
   selectedUser: User | null = null;
+  userToDelete: User | null = null;
   
   // Forms
   createUserForm: FormGroup;
@@ -276,6 +278,11 @@ export class UsersComponent implements OnInit {
     this.selectedUser = null;
   }
 
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+    this.userToDelete = null;
+  }
+
   onCreateUser() {
     if (this.createUserForm.invalid) {
       this.markFormGroupTouched(this.createUserForm);
@@ -352,7 +359,6 @@ export class UsersComponent implements OnInit {
     this.userService.updateUser(this.selectedUser.id, updateData).subscribe({
       next: (response) => {
         if (response.success) {
-          console.log('Showing success notification');
           this.notificationService.success(
             'Firmante actualizado exitosamente',
             `Los datos del firmante han sido actualizados correctamente.`
@@ -379,48 +385,42 @@ export class UsersComponent implements OnInit {
   }
 
   onViewUser(user: User) {
-    // Get full user details from API
-    this.userService.getUserById(user.id).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.selectedUser = response.data;
-          this.showViewModal = true;
-        } else {
-          this.notificationService.error('Error', 'No se pudieron cargar los detalles del firmante');
-        }
-      },
-      error: (error) => {
-        console.error('Error loading user details:', error);
-        this.notificationService.error('Error', 'No se pudieron cargar los detalles del firmante');
-      }
-    });
+    // Use the user data that's already available from the list
+    this.selectedUser = user;
+    this.showViewModal = true;
   }
 
   onDeleteUser(user: User) {
-    if (confirm(`¿Está seguro de que desea eliminar al firmante "${user.nombre} ${user.apellido}"?\n\nEsta acción cambiará el estado del firmante a ELIMINADO y ya no aparecerá en la lista de firmantes activos.`)) {
-      this.userService.deleteUser(user.id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.notificationService.success('Firmante eliminado', `${user.nombre} ${user.apellido} ha sido eliminado del sistema.`);
-            this.loadUsers();
-          } else {
-            this.notificationService.error('Error al eliminar firmante', response.message);
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting user:', error);
-          
-          let errorMessage = 'No se pudo eliminar el firmante. Inténtelo nuevamente.';
-          if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-          } else if (error.message) {
-            errorMessage = error.message;
-          }
-          
-          this.notificationService.error('Error al eliminar firmante', errorMessage);
+    this.userToDelete = user;
+    this.showDeleteModal = true;
+  }
+
+  confirmDeleteUser() {
+    if (!this.userToDelete) return;
+
+    this.userService.deleteUser(this.userToDelete.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.notificationService.success('Firmante eliminado', `${this.userToDelete!.nombre} ${this.userToDelete!.apellido} ha sido eliminado del sistema.`);
+          this.closeDeleteModal();
+          this.loadUsers();
+        } else {
+          this.notificationService.error('Error al eliminar firmante', response.message);
         }
-      });
-    }
+      },
+      error: (error) => {
+        console.error('Error deleting user:', error);
+        
+        let errorMessage = 'No se pudo eliminar el firmante. Inténtelo nuevamente.';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        this.notificationService.error('Error al eliminar firmante', errorMessage);
+      }
+    });
   }
 
   onResendCredentials(user: User) {
