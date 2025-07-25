@@ -12,123 +12,16 @@ export class CertificateService {
 
   constructor(private http: HttpClient) {}
 
-  getCertificates(params: CertificateListParams = {}): Observable<PagedResponse<Certificate>> {
-    // Mock data para desarrollo
-    const mockCertificates: Certificate[] = [
-      {
-        id: 1,
-        userId: 2,
-        fileName: 'certificado_juan_perez.p12',
-        fileSize: 2048,
-        uploadedAt: new Date('2024-01-15'),
-        validFrom: new Date('2024-01-01'),
-        validTo: new Date('2025-12-31'),
-        issuer: 'RENIEC - Registro Nacional de Identificación y Estado Civil',
-        subject: 'Juan Carlos Pérez Rodríguez',
-        serialNumber: '123456789ABC',
-        status: CertificateStatus.ACTIVE,
-        algorithm: 'RSA',
-        keySize: 2048,
-        isValid: true,
-        createdAt: new Date('2024-01-15'),
-        updatedAt: new Date('2024-01-15')
-      },
-      {
-        id: 2,
-        userId: 2,
-        fileName: 'certificado_backup.p12',
-        fileSize: 1024,
-        uploadedAt: new Date('2024-02-01'),
-        validFrom: new Date('2024-02-01'),
-        validTo: new Date('2025-01-31'),
-        issuer: 'IOFE - Instituto de Firmas Electrónicas',
-        subject: 'Juan Carlos Pérez Rodríguez',
-        serialNumber: 'DEF456789123',
-        status: CertificateStatus.ACTIVE,
-        algorithm: 'RSA',
-        keySize: 2048,
-        isValid: true,
-        createdAt: new Date('2024-02-01'),
-        updatedAt: new Date('2024-02-01')
-      },
-      {
-        id: 3,
-        userId: 1,
-        fileName: 'admin_certificate.p12',
-        fileSize: 3072,
-        uploadedAt: new Date('2024-01-01'),
-        validFrom: new Date('2024-01-01'),
-        validTo: new Date('2024-12-31'),
-        issuer: 'OEFA - Organismo de Evaluación y Fiscalización Ambiental',
-        subject: 'Administrador OEFA',
-        serialNumber: 'GHI789123456',
-        status: CertificateStatus.EXPIRED,
-        algorithm: 'RSA',
-        keySize: 2048,
-        isValid: false,
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-01')
-      }
-    ];
-
-    const mockResponse: PagedResponse<Certificate> = {
-      content: mockCertificates,
-      page: params.page || 0,
-      size: params.size || 10,
-      totalElements: mockCertificates.length,
-      totalPages: 1,
-      first: true,
-      last: true,
-      empty: false
-    };
-
-    return of(mockResponse);
-
-    // Implementación real comentada
-    // let httpParams = new HttpParams();
-    // if (params.page !== undefined) httpParams = httpParams.set('page', params.page.toString());
-    // if (params.size !== undefined) httpParams = httpParams.set('size', params.size.toString());
-    // if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
-    // if (params.sortDir) httpParams = httpParams.set('sortDir', params.sortDir);
-    // 
-    // return this.http.get<PagedResponse<Certificate>>(this.API_URL, { params: httpParams });
+  getAllCertificates(): Observable<ApiResponse<PagedResponse<Certificate>>> {
+    return this.http.get<ApiResponse<PagedResponse<Certificate>>>(`${this.API_URL}`);
   }
 
-  getCertificateById(id: number): Observable<Certificate> {
-    return this.http.get<Certificate>(`${this.API_URL}/${id}`);
+  getCertificateById(id: number): Observable<ApiResponse<Certificate>> {
+    return this.http.get<ApiResponse<Certificate>>(`${this.API_URL}/${id}`);
   }
 
   getCertificatesByUser(userId: number): Observable<ApiResponse<Certificate[]>> {
-    // Mock data para desarrollo
-    const mockCertificates: Certificate[] = [
-      {
-        id: 1,
-        userId: userId,
-        fileName: 'certificado_usuario.p12',
-        fileSize: 2048,
-        uploadedAt: new Date('2024-01-15'),
-        validFrom: new Date('2024-01-01'),
-        validTo: new Date('2025-12-31'),
-        issuer: 'RENIEC',
-        subject: 'Usuario Test',
-        serialNumber: '123456789ABC',
-        status: CertificateStatus.ACTIVE,
-        algorithm: 'RSA',
-        keySize: 2048,
-        isValid: true
-      }
-    ];
-
-    const mockResponse: ApiResponse<Certificate[]> = {
-      success: true,
-      message: 'Certificados obtenidos exitosamente',
-      data: mockCertificates
-    };
-
-    return of(mockResponse);
-
-    // Implementación real comentada
-    // return this.http.get<ApiResponse<Certificate[]>>(`${this.API_URL}/user/${userId}`);
+    return this.http.get<ApiResponse<Certificate[]>>(`${this.API_URL}/user/${userId}`);
   }
 
   uploadCertificate(request: CertificateUploadRequest): Observable<ApiResponse> {

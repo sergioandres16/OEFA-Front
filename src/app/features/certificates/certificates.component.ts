@@ -1,29 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CertificateV2Service } from '../../core/services/certificate-v2.service';
-import { AuthService } from '../../core/services/auth.service';
-import { Certificate, CertificateStatus } from '../../core/models/certificate-v2.model';
+import { CertificateService } from '../../core/services/certificate.service';
+import { UserService } from '../../core/services/user.service';
+import { Certificate, CertificateStatus, CertificateUploadRequest } from '../../core/models/certificate.model';
 import { User } from '../../core/models/user.model';
-import { LayoutComponent } from '../../shared/components/layout/layout.component';
+import { NotificationService } from '../../shared/services/notification.service';
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-certificates',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, LayoutComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, SidebarComponent],
   templateUrl: './certificates.component.html',
   styleUrls: ['./certificates.component.css']
 })
 export class CertificatesComponent implements OnInit {
   certificates: Certificate[] = [];
   filteredCertificates: Certificate[] = [];
-  currentUser: User | null = null;
+  users: User[] = [];
   
   // Filters
   filters = {
     search: '',
     status: '',
-    issuer: '',
+    userId: '',
     dateFrom: '',
     dateTo: ''
   };
@@ -40,132 +42,151 @@ export class CertificatesComponent implements OnInit {
   
   // UI State
   isLoading = false;
-  selectedCertificates: Set<number> = new Set();
-  showFilters = false;
+  showUploadModal = false;
+  selectedFile: File | null = null;
   
-  // Status options
-  statusOptions = [
-    { value: '', label: 'Todos los estados' },
-    { value: CertificateStatus.ACTIVE, label: 'Activo' },
-    { value: CertificateStatus.EXPIRED, label: 'Expirado' },
-    { value: CertificateStatus.REVOKED, label: 'Revocado' },
-    { value: CertificateStatus.INVALID, label: 'Inválido' }
-  ];
-
   // Forms
   uploadForm: FormGroup;
-  filterForm: FormGroup;
   
-  // UI State
-  showUploadModal = false;
-  showDeleteModal = false;
-  certificateToDelete: Certificate | null = null;
-  selectedFile: File | null = null;
-  uploadProgress = 0;
+  // Options  
+  statusOptions = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'ACTIVE', label: 'Activo' },
+    { value: 'EXPIRED', label: 'Expirado' },
+    { value: 'REVOKED', label: 'Revocado' },
+    { value: 'PENDING', label: 'Pendiente' }
+  ];
 
   constructor(
-    private certificateService: CertificateV2Service,
-    private authService: AuthService,
-    private fb: FormBuilder
+    private certificateService: CertificateService,
+    private userService: UserService,
+    private fb: FormBuilder,
+    private notificationService: NotificationService
   ) {
     this.uploadForm = this.createUploadForm();
-    this.filterForm = this.createFilterForm();
   }
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
-      this.loadCertificates();
-    });
-    
-    this.setupFilterSubscription();
+    this.loadCertificates();
+    this.loadUsers();
   }
 
   createUploadForm(): FormGroup {
     return this.fb.group({
-      userId: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      file: [null, Validators.required]
-    });
-  }
-
-  createFilterForm(): FormGroup {
-    return this.fb.group({
-      search: [''],
-      status: [''],
-      userId: ['']
-    });
-  }
-
-  setupFilterSubscription() {
-    this.filterForm.valueChanges.subscribe(() => {
-      this.applyFilters();
+      userId: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
   loadCertificates() {
     this.isLoading = true;
     
-    const params = {
-      page: this.currentPage,
-      size: this.pageSize,
-      sortBy: this.sortBy,
-      sortDir: this.sortDirection,
-      search: this.filterForm.get('search')?.value || '',
-      status: this.filterForm.get('status')?.value || '',
-      userId: this.filterForm.get('userId')?.value || undefined
-    };
-
-    this.certificateService.getAllCertificates(params).subscribe({
-      next: (certificates) => {
-        this.certificates = certificates;
-        this.totalElements = certificates.length;
-        this.totalPages = Math.ceil(this.totalElements / this.pageSize);
-        this.applyFilters();
+    this.certificateService.getAllCertificates().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.certificates = response.data.content;
+          this.totalElements = response.data.totalElements;
+          this.totalPages = response.data.totalPages;
+          this.currentPage = response.data.page;
+          this.applyFilters();
+        } else {
+          console.error('Error in API response:', response.message);
+          this.certificates = [];
+        }
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading certificates:', error);
+        this.certificates = [];
         this.isLoading = false;
+      }
+    });
+  }
+
+  loadUsers() {
+    this.userService.getAllUsers().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.users = response.data.content.filter(user => user.role === 'ROLE_FIRMANTE');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
       }
     });
   }
 
   applyFilters() {
     this.filteredCertificates = this.certificates.filter(cert => {
+      // Search filter
       const matchesSearch = !this.filters.search || 
         cert.fileName.toLowerCase().includes(this.filters.search.toLowerCase()) ||
-        cert.subject.toLowerCase().includes(this.filters.search.toLowerCase()) ||
-        cert.issuer.toLowerCase().includes(this.filters.search.toLowerCase());
+        cert.subject?.toLowerCase().includes(this.filters.search.toLowerCase()) ||
+        cert.issuer?.toLowerCase().includes(this.filters.search.toLowerCase()) ||
+        cert.serialNumber?.toLowerCase().includes(this.filters.search.toLowerCase());
       
+      // Status filter
       const matchesStatus = !this.filters.status || cert.status === this.filters.status;
       
-      const matchesIssuer = !this.filters.issuer || 
-        cert.issuer.toLowerCase().includes(this.filters.issuer.toLowerCase());
+      // User filter
+      const matchesUser = !this.filters.userId || cert.userId.toString() === this.filters.userId;
       
-      const matchesDateFrom = !this.filters.dateFrom || 
-        new Date(cert.uploadedAt) >= new Date(this.filters.dateFrom);
+      // Date range filter
+      let matchesDateRange = true;
+      if (this.filters.dateFrom || this.filters.dateTo) {
+        const certDate = new Date(cert.uploadedAt);
+        const fromDate = this.filters.dateFrom ? new Date(this.filters.dateFrom) : null;
+        const toDate = this.filters.dateTo ? new Date(this.filters.dateTo + 'T23:59:59') : null;
+        
+        if (fromDate && certDate < fromDate) matchesDateRange = false;
+        if (toDate && certDate > toDate) matchesDateRange = false;
+      }
       
-      const matchesDateTo = !this.filters.dateTo || 
-        new Date(cert.uploadedAt) <= new Date(this.filters.dateTo);
-      
-      return matchesSearch && matchesStatus && matchesIssuer && matchesDateFrom && matchesDateTo;
+      return matchesSearch && matchesStatus && matchesUser && matchesDateRange;
     });
+    
+    // Apply sorting
+    this.applySorting();
   }
 
-  onFilterChange() {
-    this.applyFilters();
-  }
-
-  clearFilters() {
-    this.filters = {
-      search: '',
-      status: '',
-      issuer: '',
-      dateFrom: '',
-      dateTo: ''
-    };
-    this.applyFilters();
+  applySorting() {
+    this.filteredCertificates.sort((a, b) => {
+      let valueA: any;
+      let valueB: any;
+      
+      switch (this.sortBy) {
+        case 'fileName':
+          valueA = a.fileName.toLowerCase();
+          valueB = b.fileName.toLowerCase();
+          break;
+        case 'userId':
+          valueA = a.userId;
+          valueB = b.userId;
+          break;
+        case 'status':
+          valueA = a.status;
+          valueB = b.status;
+          break;
+        case 'uploadedAt':
+          valueA = new Date(a.uploadedAt);
+          valueB = new Date(b.uploadedAt);
+          break;
+        case 'validTo':
+          valueA = new Date(a.validTo);
+          valueB = new Date(b.validTo);
+          break;
+        default:
+          return 0;
+      }
+      
+      if (valueA < valueB) {
+        return this.sortDirection === 'asc' ? -1 : 1;
+      }
+      if (valueA > valueB) {
+        return this.sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
   }
 
   onSort(column: string) {
@@ -175,12 +196,23 @@ export class CertificatesComponent implements OnInit {
       this.sortBy = column;
       this.sortDirection = 'asc';
     }
-    this.loadCertificates();
+    this.applySorting();
   }
 
   getSortIcon(column: string): string {
     if (this.sortBy !== column) return '↕️';
     return this.sortDirection === 'asc' ? '↑' : '↓';
+  }
+
+  clearFilters() {
+    this.filters = {
+      search: '',
+      status: '',
+      userId: '',
+      dateFrom: '',
+      dateTo: ''
+    };
+    this.applyFilters();
   }
 
   onPageChange(page: number) {
@@ -206,45 +238,126 @@ export class CertificatesComponent implements OnInit {
     return pages;
   }
 
-  toggleCertificateSelection(certificateId: number) {
-    if (this.selectedCertificates.has(certificateId)) {
-      this.selectedCertificates.delete(certificateId);
+  openUploadModal() {
+    this.showUploadModal = true;
+    this.uploadForm.reset();
+    this.selectedFile = null;
+  }
+
+  closeUploadModal() {
+    this.showUploadModal = false;
+    this.uploadForm.reset();
+    this.selectedFile = null;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && file.name.endsWith('.p12')) {
+      this.selectedFile = file;
     } else {
-      this.selectedCertificates.add(certificateId);
+      this.notificationService.error('Archivo inválido', 'Por favor selecciona un archivo .p12 válido');
+      event.target.value = '';
+      this.selectedFile = null;
     }
   }
 
-  selectAllCertificates() {
-    if (this.selectedCertificates.size === this.filteredCertificates.length) {
-      this.selectedCertificates.clear();
-    } else {
-      this.selectedCertificates.clear();
-      this.filteredCertificates.forEach(cert => this.selectedCertificates.add(cert.id));
+  onUploadCertificate() {
+    if (this.uploadForm.invalid || !this.selectedFile) {
+      this.markFormGroupTouched(this.uploadForm);
+      return;
+    }
+
+    const formData = this.uploadForm.value;
+    const request: CertificateUploadRequest = {
+      userId: parseInt(formData.userId),
+      password: formData.password,
+      file: this.selectedFile
+    };
+    
+    this.certificateService.uploadCertificate(request).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.notificationService.success(
+            'Certificado subido exitosamente',
+            'El certificado ha sido procesado y almacenado correctamente.'
+          );
+          this.closeUploadModal();
+          this.loadCertificates();
+        } else {
+          this.notificationService.error('Error al subir certificado', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error uploading certificate:', error);
+        
+        let errorMessage = 'Error al subir el certificado';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        this.notificationService.error('Error al subir certificado', errorMessage);
+      }
+    });
+  }
+
+  onViewCertificate(certificate: Certificate) {
+    this.certificateService.getCertificateById(certificate.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          // Show certificate details
+          console.log('Certificate details:', response.data);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading certificate details:', error);
+      }
+    });
+  }
+
+  onDeleteCertificate(certificate: Certificate) {
+    if (confirm(`¿Está seguro de que desea eliminar el certificado "${certificate.fileName}"?`)) {
+      this.certificateService.deleteCertificate(certificate.id).subscribe({
+        next: (response) => {
+          this.notificationService.success('Certificado eliminado', 'El certificado ha sido eliminado del sistema.');
+          this.loadCertificates();
+        },
+        error: (error) => {
+          console.error('Error deleting certificate:', error);
+          this.notificationService.error('Error al eliminar certificado', 'No se pudo eliminar el certificado. Inténtelo nuevamente.');
+        }
+      });
     }
   }
 
-  isAllSelected(): boolean {
-    return this.filteredCertificates.length > 0 && 
-           this.selectedCertificates.size === this.filteredCertificates.length;
-  }
-
-  getStatusBadgeClass(status: CertificateStatus): string {
+  getStatusBadgeClass(status: string): string {
     switch (status) {
-      case CertificateStatus.ACTIVE: return 'badge-success';
-      case CertificateStatus.EXPIRED: return 'badge-warning';
-      case CertificateStatus.REVOKED: return 'badge-danger';
-      case CertificateStatus.INVALID: return 'badge-danger';
-      default: return 'badge-secondary';
+      case 'ACTIVE':
+        return 'badge-success';
+      case 'EXPIRED':
+        return 'badge-warning';
+      case 'REVOKED':
+        return 'badge-error';
+      case 'PENDING':
+        return 'badge-info';
+      default:
+        return 'badge-info';
     }
   }
 
-  getStatusText(status: CertificateStatus): string {
+  getStatusDisplayName(status: string): string {
     switch (status) {
-      case CertificateStatus.ACTIVE: return 'Activo';
-      case CertificateStatus.EXPIRED: return 'Expirado';
-      case CertificateStatus.REVOKED: return 'Revocado';
-      case CertificateStatus.INVALID: return 'Inválido';
-      default: return status;
+      case 'ACTIVE':
+        return 'Activo';
+      case 'EXPIRED':
+        return 'Expirado';
+      case 'REVOKED':
+        return 'Revocado';
+      case 'PENDING':
+        return 'Pendiente';
+      default:
+        return 'Desconocido';
     }
   }
 
@@ -256,157 +369,28 @@ export class CertificatesComponent implements OnInit {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString('es-PE', {
+  formatDateTime(date: string | Date): string {
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('es-PE', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
-  }
-
-  canEditCertificate(certificate: Certificate): boolean {
-    return this.currentUser?.role === 'ROLE_ADMIN' || 
-           certificate.userId === this.currentUser?.id;
-  }
-
-  canDeleteCertificate(certificate: Certificate): boolean {
-    return this.currentUser?.role === 'ROLE_ADMIN' || 
-           certificate.userId === this.currentUser?.id;
-  }
-
-  onUploadCertificate() {
-    this.openUploadModal();
-  }
-
-  onEditCertificate(certificate: Certificate) {
-    // TODO: Implement edit functionality
-    alert('Funcionalidad de edición no implementada aún');
-  }
-
-  // Upload methods
-  openUploadModal() {
-    this.showUploadModal = true;
-    this.uploadForm.reset();
-    this.selectedFile = null;
-    this.uploadProgress = 0;
-  }
-
-  closeUploadModal() {
-    this.showUploadModal = false;
-    this.uploadForm.reset();
-    this.selectedFile = null;
-    this.uploadProgress = 0;
-  }
-
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file && file.name.endsWith('.p12')) {
-      this.selectedFile = file;
-      this.uploadForm.patchValue({ file: file });
-    } else {
-      alert('Por favor selecciona un archivo .p12 válido');
-      event.target.value = '';
-    }
-  }
-
-  onUploadSubmit() {
-    if (this.uploadForm.valid && this.selectedFile) {
-      const formData = this.uploadForm.value;
-      
-      this.certificateService.uploadCertificate(
-        formData.userId,
-        formData.password,
-        this.selectedFile
-      ).subscribe({
-        next: (response) => {
-          alert('Certificado subido exitosamente');
-          this.closeUploadModal();
-          this.loadCertificates();
-        },
-        error: (error) => {
-          console.error('Error uploading certificate:', error);
-          alert('Error al subir el certificado');
-        }
-      });
-    }
-  }
-
-  onViewCertificate(certificate: Certificate) {
-    // Show certificate details in a modal or navigate to detail view
-    console.log('View certificate:', certificate);
-    alert(`Detalles del certificado:\n\nArchivo: ${certificate.fileName}\nSujeto: ${certificate.subject}\nEmisor: ${certificate.issuer}\nVálido desde: ${this.formatDate(new Date(certificate.validFrom))}\nVálido hasta: ${this.formatDate(new Date(certificate.validTo))}\nEstado: ${this.getStatusText(certificate.status)}`);
-  }
-
-  confirmDeleteCertificate(certificate: Certificate) {
-    this.certificateToDelete = certificate;
-    this.showDeleteModal = true;
-  }
-
-  onDeleteCertificate(certificate?: Certificate) {
-    if (certificate) {
-      // Direct delete from button click
-      this.confirmDeleteCertificate(certificate);
-    } else if (this.certificateToDelete) {
-      // Delete from modal confirmation
-      this.certificateService.deleteCertificate(this.certificateToDelete.id).subscribe({
-        next: (response) => {
-          alert('Certificado eliminado exitosamente');
-          this.showDeleteModal = false;
-          this.certificateToDelete = null;
-          this.loadCertificates();
-        },
-        error: (error) => {
-          console.error('Error deleting certificate:', error);
-          alert('Error al eliminar el certificado');
-        }
-      });
-    }
-  }
-
-  cancelDelete() {
-    this.showDeleteModal = false;
-    this.certificateToDelete = null;
-  }
-
-  onBulkDelete() {
-    if (this.selectedCertificates.size === 0) return;
-    
-    const count = this.selectedCertificates.size;
-    if (confirm(`¿Está seguro de que desea eliminar ${count} certificado(s) seleccionado(s)?`)) {
-      const certificateIds = Array.from(this.selectedCertificates);
-      
-      this.certificateService.deleteCertificates(certificateIds).subscribe({
-        next: (response) => {
-          alert(response.message);
-          this.selectedCertificates.clear();
-          this.loadCertificates();
-        },
-        error: (error) => {
-          console.error('Error deleting certificates:', error);
-          alert('Error al eliminar los certificados');
-        }
-      });
-    }
-  }
-
-  onValidateCertificate(certificate: Certificate) {
-    this.certificateService.validateCertificate(certificate.id).subscribe({
-      next: (response) => {
-        alert('Certificado validado correctamente');
-        this.loadCertificates();
-      },
-      error: (error) => {
-        console.error('Error validating certificate:', error);
-        alert('Error al validar el certificado');
-      }
+    const formattedTime = dateObj.toLocaleTimeString('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
     });
+    return `${formattedDate} ${formattedTime}`;
   }
 
-  // Form validation helpers
-  getFieldError(formName: string, fieldName: string): string | null {
-    const form = formName === 'upload' ? this.uploadForm : this.filterForm;
-    const field = form.get(fieldName);
-    
+  getUserName(userId: number): string {
+    const user = this.users.find(u => u.id === userId);
+    return user ? `${user.nombre} ${user.apellido}` : `ID: ${userId}`;
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const field = this.uploadForm.get(fieldName);
     if (field && field.errors && field.touched) {
       if (field.errors['required']) {
         return 'Este campo es requerido';
@@ -418,51 +402,19 @@ export class CertificatesComponent implements OnInit {
     return null;
   }
 
-  isFieldInvalid(formName: string, fieldName: string): boolean {
-    const form = formName === 'upload' ? this.uploadForm : this.filterForm;
-    const field = form.get(fieldName);
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.uploadForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
 
-  trackByCertificate(index: number, certificate: Certificate): number {
-    return certificate.id;
-  }
-
-  getDaysUntilExpiration(validTo: Date | string): string {
-    const now = new Date();
-    const expiration = new Date(validTo);
-    const diffTime = expiration.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) {
-      return 'Expirado';
-    } else if (diffDays === 0) {
-      return 'Expira hoy';
-    } else if (diffDays === 1) {
-      return 'Expira mañana';
-    } else if (diffDays <= 30) {
-      return `${diffDays} días restantes`;
-    } else {
-      return `${Math.ceil(diffDays / 30)} meses restantes`;
-    }
-  }
-
-  isExpiringSoon(validTo: Date | string): boolean {
-    const now = new Date();
-    const expiration = new Date(validTo);
-    const diffTime = expiration.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 30 && diffDays > 0;
-  }
-
-  isExpired(validTo: Date | string): boolean {
-    const now = new Date();
-    const expiration = new Date(validTo);
-    return expiration <= now;
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+    });
   }
 
   getMaxItemsShown(): number {
     return Math.min((this.currentPage + 1) * this.pageSize, this.totalElements);
   }
-
 }
