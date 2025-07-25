@@ -48,10 +48,14 @@ export class CertificatesComponent implements OnInit {
   // Status options
   statusOptions = [
     { value: '', label: 'Todos los estados' },
-    { value: 'ACTIVE', label: 'Activo' },
-    { value: 'EXPIRED', label: 'Expirado' },
-    { value: 'REVOKED', label: 'Revocado' },
-    { value: 'PENDING', label: 'Pendiente' }
+    { value: 'VALIDO', label: 'Válido' },
+    { value: 'REVOCADO', label: 'Revocado' },
+    { value: 'INVALIDO', label: 'Inválido' },
+    { value: 'CADUCADO', label: 'Caducado' },
+    { value: 'NO_PERMITIDO_FIRMA_DIGITAL', label: 'No permitido firma digital' },
+    { value: 'ADULTERADO', label: 'Adulterado' },
+    { value: 'PENDIENTE_VALIDACION', label: 'Pendiente validación' },
+    { value: 'ELIMINADO', label: 'Eliminado' }
   ];
 
   // Forms
@@ -266,20 +270,28 @@ export class CertificatesComponent implements OnInit {
 
   getStatusBadgeClass(status: string): string {
     switch (status) {
-      case 'ACTIVE': return 'badge-success';
-      case 'EXPIRED': return 'badge-warning';
-      case 'REVOKED': return 'badge-danger';
-      case 'PENDING': return 'badge-info';
+      case 'VALIDO': return 'badge-success';
+      case 'CADUCADO': return 'badge-warning';
+      case 'REVOCADO': return 'badge-danger';
+      case 'INVALIDO': return 'badge-danger';
+      case 'ADULTERADO': return 'badge-danger';
+      case 'NO_PERMITIDO_FIRMA_DIGITAL': return 'badge-warning';
+      case 'PENDIENTE_VALIDACION': return 'badge-info';
+      case 'ELIMINADO': return 'badge-secondary';
       default: return 'badge-secondary';
     }
   }
 
   getStatusText(status: string): string {
     switch (status) {
-      case 'ACTIVE': return 'Activo';
-      case 'EXPIRED': return 'Expirado';
-      case 'REVOKED': return 'Revocado';
-      case 'PENDING': return 'Pendiente';
+      case 'VALIDO': return 'Válido';
+      case 'REVOCADO': return 'Revocado';
+      case 'INVALIDO': return 'Inválido';
+      case 'CADUCADO': return 'Caducado';
+      case 'NO_PERMITIDO_FIRMA_DIGITAL': return 'No permitido firma digital';
+      case 'ADULTERADO': return 'Adulterado';
+      case 'PENDIENTE_VALIDACION': return 'Pendiente validación';
+      case 'ELIMINADO': return 'Eliminado';
       default: return status;
     }
   }

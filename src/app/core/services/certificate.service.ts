@@ -52,14 +52,20 @@ export class CertificateService {
 
   getStatusBadgeClass(status: CertificateStatus): string {
     switch (status) {
-      case CertificateStatus.ACTIVE:
+      case CertificateStatus.VALIDO:
         return 'badge-success';
-      case CertificateStatus.EXPIRED:
+      case CertificateStatus.CADUCADO:
         return 'badge-warning';
-      case CertificateStatus.REVOKED:
+      case CertificateStatus.REVOCADO:
+      case CertificateStatus.INVALIDO:
+      case CertificateStatus.ADULTERADO:
         return 'badge-error';
-      case CertificateStatus.PENDING:
+      case CertificateStatus.NO_PERMITIDO_FIRMA_DIGITAL:
+        return 'badge-warning';
+      case CertificateStatus.PENDIENTE_VALIDACION:
         return 'badge-info';
+      case CertificateStatus.ELIMINADO:
+        return 'badge-secondary';
       default:
         return 'badge-info';
     }
@@ -67,14 +73,22 @@ export class CertificateService {
 
   getStatusText(status: CertificateStatus): string {
     switch (status) {
-      case CertificateStatus.ACTIVE:
-        return 'Activo';
-      case CertificateStatus.EXPIRED:
-        return 'Expirado';
-      case CertificateStatus.REVOKED:
+      case CertificateStatus.VALIDO:
+        return 'Válido';
+      case CertificateStatus.REVOCADO:
         return 'Revocado';
-      case CertificateStatus.PENDING:
-        return 'Pendiente';
+      case CertificateStatus.INVALIDO:
+        return 'Inválido';
+      case CertificateStatus.CADUCADO:
+        return 'Caducado';
+      case CertificateStatus.NO_PERMITIDO_FIRMA_DIGITAL:
+        return 'No permitido firma digital';
+      case CertificateStatus.ADULTERADO:
+        return 'Adulterado';
+      case CertificateStatus.PENDIENTE_VALIDACION:
+        return 'Pendiente validación';
+      case CertificateStatus.ELIMINADO:
+        return 'Eliminado';
       default:
         return 'Desconocido';
     }
