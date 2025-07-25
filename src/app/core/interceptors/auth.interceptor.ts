@@ -13,13 +13,19 @@ export function authInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obs
   let authReq = req;
   if (!isLoginRequest) {
     const token = authService.getToken();
+    console.log('Auth Interceptor - URL:', req.url, 'Token exists:', !!token);
     if (token) {
       authReq = req.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
         }
       });
+      console.log('Auth Interceptor - Added Authorization header');
+    } else {
+      console.log('Auth Interceptor - No token available');
     }
+  } else {
+    console.log('Auth Interceptor - Skipping login request:', req.url);
   }
 
   return next(authReq).pipe(
