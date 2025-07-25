@@ -693,3 +693,60 @@
     min-width: 150px;
   }
 }
+
+/* Certificate Details Modal Styles */
+.certificate-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.certificate-details-grid .detail-section:nth-child(3),
+.certificate-details-grid .detail-section:nth-child(4) {
+  grid-column: span 2;
+}
+
+.uuid {
+  font-family: monospace;
+  font-size: 0.8rem;
+  background: var(--gray-100);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  word-break: break-all;
+}
+
+.serial-number {
+  font-family: monospace;
+  font-size: 0.875rem;
+  background: var(--gray-100);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.user-info {
+  font-weight: 500;
+  color: var(--primary-dark);
+}
+
+.expiring {
+  color: var(--warning) !important;
+  font-weight: 600;
+}
+
+.expired {
+  color: var(--error) !important;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .certificate-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .certificate-details-grid .detail-section:nth-child(3),
+  .certificate-details-grid .detail-section:nth-child(4) {
+    grid-column: span 1;
+  }
+}

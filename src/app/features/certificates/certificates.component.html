@@ -389,11 +389,117 @@
       <p class="text-warning">Esta acción no se puede deshacer.</p>
       
       <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" (click)="cancelDelete()">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
           Cancelar
         </button>
-        <button type="button" class="btn btn-danger" (click)="onDeleteCertificate()">
-          Eliminar
+        <button type="button" class="btn btn-danger" (click)="confirmDeleteCertificate()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3,6 5,6 21,6"></polyline>
+            <path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2,-2V6m3,0V4a2,2 0 0,1,2,-2h4a2,2 0 0,1,2,2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          Eliminar Certificado
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Certificate Modal -->
+<div class="modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalles del Certificado</h2>
+      <button class="modal-close" (click)="closeViewModal()">
+        <i class="icon-close"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="certificate-details-grid" *ngIf="selectedCertificate">
+        <div class="detail-section">
+          <h3>Información del Certificado</h3>
+          <div class="detail-row">
+            <label>Nombre del archivo:</label>
+            <span>{{ selectedCertificate.fileName }}</span>
+          </div>
+          <div class="detail-row">
+            <label>UUID del archivo:</label>
+            <span class="uuid">{{ selectedCertificate.fileUuid }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Estado:</label>
+            <span class="status-badge" [class]="getStatusBadgeClass(selectedCertificate.status)">
+              {{ getStatusText(selectedCertificate.status) }}
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="selectedCertificate.validationMessage">
+            <label>Mensaje de validación:</label>
+            <span>{{ selectedCertificate.validationMessage }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Información del Titular</h3>
+          <div class="detail-row">
+            <label>Sujeto (CN):</label>
+            <span>{{ selectedCertificate.subjectCN || 'N/A' }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Emisor (CN):</label>
+            <span>{{ selectedCertificate.issuerCN || 'N/A' }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedCertificate.serialNumber">
+            <label>Número de serie:</label>
+            <span class="serial-number">{{ selectedCertificate.serialNumber }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Firmante asociado:</label>
+            <span class="user-info">{{ getUserName(selectedCertificate.userId) }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Validez del Certificado</h3>
+          <div class="detail-row" *ngIf="selectedCertificate.validFrom">
+            <label>Válido desde:</label>
+            <span>{{ formatDate(selectedCertificate.validFrom) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedCertificate.validTo">
+            <label>Válido hasta:</label>
+            <span [class.expiring]="isExpiringSoon(selectedCertificate.validTo)" [class.expired]="isExpired(selectedCertificate.validTo)">
+              {{ formatDate(selectedCertificate.validTo) }}
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="selectedCertificate.validTo">
+            <label>Estado de vigencia:</label>
+            <span [class.expiring]="isExpiringSoon(selectedCertificate.validTo)" [class.expired]="isExpired(selectedCertificate.validTo)">
+              {{ getDaysUntilExpiration(selectedCertificate.validTo) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Información del Sistema</h3>
+          <div class="detail-row">
+            <label>Fecha de registro:</label>
+            <span>{{ formatDate(selectedCertificate.createdAt) }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Última actualización:</label>
+            <span>{{ formatDate(selectedCertificate.updatedAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeViewModal()">
+          Cerrar
         </button>
       </div>
     </div>

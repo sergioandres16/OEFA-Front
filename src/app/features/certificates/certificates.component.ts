@@ -63,7 +63,9 @@ export class CertificatesComponent implements OnInit {
   // UI State
   showUploadModal = false;
   showDeleteModal = false;
+  showViewModal = false;
   certificateToDelete: Certificate | null = null;
+  selectedCertificate: Certificate | null = null;
   selectedFile: File | null = null;
 
   constructor(
@@ -76,7 +78,7 @@ export class CertificatesComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.loadCertificates();
+    this.loadCertificates();
     this.loadUsers();
   }
 
@@ -93,11 +95,17 @@ export class CertificatesComponent implements OnInit {
     this.certificateService.getAllCertificates().subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          this.certificates = response.data.content || [];
-          this.totalElements = response.data.totalElements || 0;
-          this.totalPages = response.data.totalPages || 0;
+          // Filter out deleted certificates (status != ELIMINADO)
+          const activeCertificates = response.data.content?.filter(cert => 
+            cert.status !== 'ELIMINADO'
+          ) || [];
+          
+          this.certificates = activeCertificates;
+          this.totalElements = activeCertificates.length;
+          this.totalPages = Math.ceil(activeCertificates.length / this.pageSize);
           this.currentPage = response.data.page || 0;
           this.applyFilters();
+          console.log('Certificates loaded:', activeCertificates);
         } else {
           console.error('Error in API response:', response.message);
           this.certificates = [];
@@ -106,6 +114,15 @@ export class CertificatesComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading certificates:', error);
+        
+        let errorMessage = 'Error al cargar los certificados';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        this.notificationService.error('Error al cargar certificados', errorMessage);
         this.certificates = [];
         this.isLoading = false;
       }
@@ -389,49 +406,68 @@ export class CertificatesComponent implements OnInit {
     this.certificateService.getCertificateById(certificate.id).subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          // Show certificate details
-          const cert = response.data;
-          this.notificationService.info('Detalles del certificado', 
-            `Archivo: ${cert.fileName}\nSujeto: ${cert.subject || 'N/A'}\nEmisor: ${cert.issuer || 'N/A'}\nVálido desde: ${this.formatDate(cert.validFrom!)}\nVálido hasta: ${this.formatDate(cert.validTo!)}\nEstado: ${this.getStatusText(cert.status)}`
-          );
+          this.selectedCertificate = response.data;
+          this.showViewModal = true;
+        } else {
+          this.notificationService.error('Error', 'No se pudieron cargar los detalles del certificado');
         }
       },
       error: (error) => {
         console.error('Error loading certificate details:', error);
-        this.notificationService.error('Error', 'No se pudieron cargar los detalles del certificado');
+        
+        let errorMessage = 'No se pudieron cargar los detalles del certificado';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        this.notificationService.error('Error', errorMessage);
       }
     });
   }
 
-  confirmDeleteCertificate(certificate: Certificate) {
+  onDeleteCertificate(certificate: Certificate) {
     this.certificateToDelete = certificate;
     this.showDeleteModal = true;
   }
 
-  onDeleteCertificate(certificate?: Certificate) {
-    if (certificate) {
-      // Direct delete from button click
-      this.confirmDeleteCertificate(certificate);
-    } else if (this.certificateToDelete) {
-      // Delete from modal confirmation
-      this.certificateService.deleteCertificate(this.certificateToDelete.id).subscribe({
-        next: (response) => {
+  confirmDeleteCertificate() {
+    if (!this.certificateToDelete) return;
+
+    this.certificateService.deleteCertificate(this.certificateToDelete.id).subscribe({
+      next: (response) => {
+        if (response.success) {
           this.notificationService.success('Certificado eliminado', 'El certificado ha sido eliminado del sistema.');
-          this.showDeleteModal = false;
-          this.certificateToDelete = null;
+          this.closeDeleteModal();
           this.loadCertificates();
-        },
-        error: (error) => {
-          console.error('Error deleting certificate:', error);
-          this.notificationService.error('Error al eliminar certificado', 'No se pudo eliminar el certificado. Inténtelo nuevamente.');
+        } else {
+          this.notificationService.error('Error al eliminar certificado', response.message);
         }
-      });
-    }
+      },
+      error: (error) => {
+        console.error('Error deleting certificate:', error);
+        
+        let errorMessage = 'No se pudo eliminar el certificado. Inténtelo nuevamente.';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        this.notificationService.error('Error al eliminar certificado', errorMessage);
+      }
+    });
   }
 
-  cancelDelete() {
+  closeDeleteModal() {
     this.showDeleteModal = false;
     this.certificateToDelete = null;
+  }
+
+  closeViewModal() {
+    this.showViewModal = false;
+    this.selectedCertificate = null;
   }
 
   onBulkDelete() {
