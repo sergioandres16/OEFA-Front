@@ -100,22 +100,13 @@
   background: var(--white);
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--gray-200);
-  margin-bottom: 2rem;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.filters-section.expanded {
-  max-height: 200px;
-  opacity: 1;
   padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .filters-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr auto;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
   gap: 1rem;
   align-items: end;
 }

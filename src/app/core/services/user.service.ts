@@ -184,51 +184,52 @@ export class UserService {
    * These simulate what would be real endpoints
    */
   
-  getUserById(id: number): Observable<User> {
-    // Mock implementation - replace with real API when available
-    return new Observable(observer => {
-      setTimeout(() => {
-        const mockUser: User = {
-          id: id,
-          nombre: 'Usuario',
-          apellido: 'Ejemplo',
-          email: `user${id}@example.com`,
-          dni: '12345678',
-          role: UserRole.ROLE_FIRMANTE,
-          cargo: 'Cargo de ejemplo',
-          status: UserStatus.ACTIVE
-        };
-        observer.next(mockUser);
-        observer.complete();
-      }, 500);
-    });
+  /**
+   * Get firmante by ID (Admin only)
+   */
+  getUserById(id: number): Observable<ApiResponse<User>> {
+    this.isLoadingSubject.next(true);
+    
+    return this.http.get<ApiResponse<User>>(`${this.API_URL}/admin/firmantes/${id}`)
+      .pipe(
+        tap(() => this.isLoadingSubject.next(false)),
+        catchError(error => {
+          this.isLoadingSubject.next(false);
+          throw error;
+        })
+      );
   }
 
-  updateUser(id: number, user: Partial<User>): Observable<ApiResponse> {
-    // Mock implementation - replace with real API when available
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next({
-          success: true,
-          message: 'Usuario actualizado correctamente',
-          data: { ...user, id }
-        });
-        observer.complete();
-      }, 1000);
-    });
+  /**
+   * Edit user (Admin only) - Only email, dni, and cargo can be edited
+   */
+  updateUser(id: number, updateData: { email?: string; dni?: string; cargo?: string }): Observable<ApiResponse> {
+    this.isLoadingSubject.next(true);
+    
+    return this.http.put<ApiResponse>(`${this.API_URL}/admin/users/${id}`, updateData)
+      .pipe(
+        tap(() => this.isLoadingSubject.next(false)),
+        catchError(error => {
+          this.isLoadingSubject.next(false);
+          throw error;
+        })
+      );
   }
 
+  /**
+   * Delete user (Admin only) - Changes status to ELIMINADO
+   */
   deleteUser(id: number): Observable<ApiResponse> {
-    // Mock implementation - replace with real API when available
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next({
-          success: true,
-          message: 'Usuario eliminado correctamente'
-        });
-        observer.complete();
-      }, 1000);
-    });
+    this.isLoadingSubject.next(true);
+    
+    return this.http.delete<ApiResponse>(`${this.API_URL}/admin/users/${id}`)
+      .pipe(
+        tap(() => this.isLoadingSubject.next(false)),
+        catchError(error => {
+          this.isLoadingSubject.next(false);
+          throw error;
+        })
+      );
   }
 
   bulkDeleteUsers(userIds: number[]): Observable<ApiResponse> {

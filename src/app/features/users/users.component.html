@@ -373,35 +373,18 @@
     </div>
 
     <form [formGroup]="editUserForm" (ngSubmit)="onUpdateUser()" class="modal-body">
+      <div class="user-info-readonly">
+        <div class="info-row">
+          <label>Nombre completo:</label>
+          <span>{{ selectedUser?.nombre }} {{ selectedUser?.apellido }}</span>
+        </div>
+        <div class="info-row">
+          <label>Rol:</label>
+          <span>{{ selectedUser?.role === 'ROLE_FIRMANTE' ? 'Firmante' : 'Administrador' }}</span>
+        </div>
+      </div>
+
       <div class="form-grid">
-        <div class="form-group">
-          <label for="editNombre" class="form-label">Nombre *</label>
-          <input
-            id="editNombre"
-            type="text"
-            formControlName="nombre"
-            class="form-control"
-            [class.is-invalid]="isFieldInvalid('nombre', 'edit')"
-            placeholder="Ingresa el nombre">
-          <span *ngIf="getFieldError('nombre', 'edit')" class="form-error">
-            {{ getFieldError('nombre', 'edit') }}
-          </span>
-        </div>
-
-        <div class="form-group">
-          <label for="editApellido" class="form-label">Apellido *</label>
-          <input
-            id="editApellido"
-            type="text"
-            formControlName="apellido"
-            class="form-control"
-            [class.is-invalid]="isFieldInvalid('apellido', 'edit')"
-            placeholder="Ingresa el apellido">
-          <span *ngIf="getFieldError('apellido', 'edit')" class="form-error">
-            {{ getFieldError('apellido', 'edit') }}
-          </span>
-        </div>
-
         <div class="form-group">
           <label for="editEmail" class="form-label">Email *</label>
           <input
@@ -444,17 +427,6 @@
             {{ getFieldError('cargo', 'edit') }}
           </span>
         </div>
-
-        <div class="form-group">
-          <label for="editRole" class="form-label">Rol *</label>
-          <select
-            id="editRole"
-            formControlName="role"
-            class="form-control">
-            <option value="ROLE_FIRMANTE">Firmante</option>
-            <option value="ROLE_ADMIN">Administrador</option>
-          </select>
-        </div>
       </div>
 
       <div class="modal-actions">
@@ -466,6 +438,75 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- View User Modal -->
+<div class="modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalles del Firmante</h2>
+      <button class="modal-close" (click)="closeViewModal()">
+        <i class="icon-close"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="user-details-grid" *ngIf="selectedUser">
+        <div class="detail-section">
+          <h3>Información Personal</h3>
+          <div class="detail-row">
+            <label>Nombre completo:</label>
+            <span>{{ selectedUser.nombre }} {{ selectedUser.apellido }}</span>
+          </div>
+          <div class="detail-row">
+            <label>DNI:</label>
+            <span>{{ selectedUser.dni }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Email:</label>
+            <span>{{ selectedUser.email }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Cargo:</label>
+            <span>{{ selectedUser.cargo }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Información del Sistema</h3>
+          <div class="detail-row">
+            <label>Rol:</label>
+            <span class="role-badge" [class]="selectedUser.role.toLowerCase()">
+              {{ selectedUser.role === 'ROLE_FIRMANTE' ? 'Firmante' : 'Administrador' }}
+            </span>
+          </div>
+          <div class="detail-row">
+            <label>Estado:</label>
+            <span class="status-badge" [class]="selectedUser.status?.toLowerCase()">
+              {{ getStatusText(selectedUser.status!) }}
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="selectedUser.createdAt">
+            <label>Fecha de registro:</label>
+            <span>{{ formatDate(selectedUser.createdAt) }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedUser.updatedAt">
+            <label>Última actualización:</label>
+            <span>{{ formatDate(selectedUser.updatedAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeViewModal()">
+          Cerrar
+        </button>
+        <button type="button" class="btn btn-primary" (click)="closeViewModal(); onEditUser(selectedUser!)">
+          Editar
+        </button>
+      </div>
+    </div>
   </div>
 </div>
     </main>

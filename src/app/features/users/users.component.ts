@@ -41,6 +41,7 @@ export class UsersComponent implements OnInit {
   isLoading = false;
   showCreateModal = false;
   showEditModal = false;
+  showViewModal = false;
   selectedUser: User | null = null;
   
   // Forms
@@ -60,7 +61,7 @@ export class UsersComponent implements OnInit {
     private notificationService: NotificationService
   ) {
     this.createUserForm = this.createForm();
-    this.editUserForm = this.createForm();
+    this.editUserForm = this.createEditForm();
   }
 
   ngOnInit() {
@@ -71,6 +72,14 @@ export class UsersComponent implements OnInit {
     return this.fb.group({
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
       apellido: ['', [Validators.required, Validators.maxLength(100)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
+      dni: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
+      cargo: ['', [Validators.required, Validators.maxLength(150)]]
+    });
+  }
+
+  createEditForm(): FormGroup {
+    return this.fb.group({
       email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
       dni: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
       cargo: ['', [Validators.required, Validators.maxLength(150)]]
@@ -262,6 +271,11 @@ export class UsersComponent implements OnInit {
     this.selectedUser = null;
   }
 
+  closeViewModal() {
+    this.showViewModal = false;
+    this.selectedUser = null;
+  }
+
   onCreateUser() {
     if (this.createUserForm.invalid) {
       this.markFormGroupTouched(this.createUserForm);
@@ -314,14 +328,11 @@ export class UsersComponent implements OnInit {
     this.selectedUser = user;
     this.showEditModal = true;
     
-    // Populate the edit form with current user data
+    // Populate the edit form with current user data (only editable fields)
     this.editUserForm.patchValue({
-      nombre: user.nombre,
-      apellido: user.apellido,
       email: user.email,
       dni: user.dni,
-      cargo: user.cargo,
-      role: user.role
+      cargo: user.cargo
     });
   }
 
@@ -332,62 +343,80 @@ export class UsersComponent implements OnInit {
     }
 
     const formData = this.editUserForm.value;
-    const request = {
-      id: this.selectedUser.id,
-      nombre: formData.nombre,
-      apellido: formData.apellido,
+    const updateData = {
       email: formData.email,
       dni: formData.dni,
-      cargo: formData.cargo,
-      role: formData.role
+      cargo: formData.cargo
     };
     
-    this.userService.updateUser(this.selectedUser.id, request).subscribe({
+    this.userService.updateUser(this.selectedUser.id, updateData).subscribe({
       next: (response) => {
         if (response.success) {
           this.notificationService.success(
-            'Usuario actualizado exitosamente',
-            `${response.data.nombre} ${response.data.apellido} ha sido actualizado.`
+            'Firmante actualizado exitosamente',
+            `Los datos del firmante han sido actualizados correctamente.`
           );
           this.closeEditModal();
-          // Refresh the user list to show updated data
           this.loadUsers();
         } else {
-          this.notificationService.error('Error al actualizar usuario', response.message);
+          this.notificationService.error('Error al actualizar firmante', response.message);
         }
       },
       error: (error) => {
         console.error('Error updating user:', error);
         
-        let errorMessage = 'Error al actualizar el usuario';
+        let errorMessage = 'Error al actualizar el firmante';
         if (error.error && error.error.message) {
           errorMessage = error.error.message;
         } else if (error.message) {
           errorMessage = error.message;
         }
         
-        this.notificationService.error('Error al actualizar usuario', errorMessage);
+        this.notificationService.error('Error al actualizar firmante', errorMessage);
       }
     });
   }
 
   onViewUser(user: User) {
-    this.selectedUser = user;
-    // TODO: Implementar modal de vista
-    console.log('View user:', user);
+    // Get full user details from API
+    this.userService.getUserById(user.id).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.selectedUser = response.data;
+          this.showViewModal = true;
+        } else {
+          this.notificationService.error('Error', 'No se pudieron cargar los detalles del firmante');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading user details:', error);
+        this.notificationService.error('Error', 'No se pudieron cargar los detalles del firmante');
+      }
+    });
   }
 
   onDeleteUser(user: User) {
-    if (confirm(`¿Está seguro de que desea eliminar al usuario "${user.nombre} ${user.apellido}"?`)) {
+    if (confirm(`¿Está seguro de que desea eliminar al firmante "${user.nombre} ${user.apellido}"?\n\nEsta acción cambiará el estado del firmante a ELIMINADO y ya no aparecerá en la lista de firmantes activos.`)) {
       this.userService.deleteUser(user.id).subscribe({
         next: (response) => {
-          this.notificationService.success('Usuario eliminado', `${user.nombre} ${user.apellido} ha sido eliminado del sistema.`);
-          // Refresh the user list to show updated data
-          this.loadUsers();
+          if (response.success) {
+            this.notificationService.success('Firmante eliminado', `${user.nombre} ${user.apellido} ha sido eliminado del sistema.`);
+            this.loadUsers();
+          } else {
+            this.notificationService.error('Error al eliminar firmante', response.message);
+          }
         },
         error: (error) => {
           console.error('Error deleting user:', error);
-          this.notificationService.error('Error al eliminar usuario', 'No se pudo eliminar el usuario. Inténtelo nuevamente.');
+          
+          let errorMessage = 'No se pudo eliminar el firmante. Inténtelo nuevamente.';
+          if (error.error && error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          this.notificationService.error('Error al eliminar firmante', errorMessage);
         }
       });
     }
@@ -509,5 +538,13 @@ export class UsersComponent implements OnInit {
     return Math.min((this.currentPage + 1) * this.pageSize, this.totalElements);
   }
 
-
+  getStatusText(status: string): string {
+    switch (status) {
+      case 'ACTIVO': return 'Activo';
+      case 'PENDIENTE': return 'Pendiente';
+      case 'INACTIVO': return 'Inactivo';
+      case 'ELIMINADO': return 'Eliminado';
+      default: return status;
+    }
+  }
 }
