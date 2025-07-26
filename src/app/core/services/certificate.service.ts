@@ -36,11 +36,10 @@ export class CertificateService {
   }
 
   deleteCertificate(id: number): Observable<ApiResponse> {
-    const url = `${this.API_URL}/${id}`;
-    console.log('Certificate Service - DELETE URL:', url);
-    return this.http.delete<ApiResponse>(url);
+    return this.http.delete<ApiResponse>(`${this.API_URL}/${id}`);
   }
 
+  // Preparado para cuando esté disponible la API de edición
   updateCertificate(id: number, updateData: Partial<Certificate>): Observable<ApiResponse<Certificate>> {
     return this.http.put<ApiResponse<Certificate>>(`${this.API_URL}/${id}`, updateData);
   }

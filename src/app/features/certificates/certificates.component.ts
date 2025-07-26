@@ -8,6 +8,7 @@ import { Certificate, CertificateStatus, CertificateUploadRequest } from '../../
 import { User } from '../../core/models/user.model';
 import { NotificationService } from '../../shared/services/notification.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-certificates',
@@ -72,7 +73,8 @@ export class CertificatesComponent implements OnInit {
     private certificateService: CertificateService,
     private userService: UserService,
     private fb: FormBuilder,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {
     this.uploadForm = this.createUploadForm();
   }
@@ -164,11 +166,12 @@ export class CertificatesComponent implements OnInit {
         (cert.issuer && cert.issuer.toLowerCase().includes(this.filters.issuer.toLowerCase())) ||
         (cert.issuerCN && cert.issuerCN.toLowerCase().includes(this.filters.issuer.toLowerCase()));
       
+      // Filtra por período de vigencia del certificado (validFrom/validTo)
       const matchesDateFrom = !this.filters.dateFrom || 
-        new Date(cert.uploadedAt!) >= new Date(this.filters.dateFrom);
+        (cert.validTo && new Date(cert.validTo) >= new Date(this.filters.dateFrom));
       
       const matchesDateTo = !this.filters.dateTo || 
-        new Date(cert.uploadedAt!) <= new Date(this.filters.dateTo + 'T23:59:59');
+        (cert.validFrom && new Date(cert.validFrom) <= new Date(this.filters.dateTo + 'T23:59:59'));
       
       return matchesSearch && matchesStatus && matchesIssuer && matchesDateFrom && matchesDateTo;
     });
@@ -358,8 +361,11 @@ export class CertificatesComponent implements OnInit {
   }
 
   onEditCertificate(certificate: Certificate) {
-    // TODO: Implementar modal de edición de certificado
-    this.notificationService.info('Funcionalidad en desarrollo', 'La edición de certificados estará disponible próximamente');
+    // Preparado para cuando esté disponible la API de edición
+    this.notificationService.info(
+      'Funcionalidad en desarrollo', 
+      `La edición del certificado "${certificate.fileName}" estará disponible próximamente.`
+    );
   }
 
   // Upload methods
@@ -460,9 +466,6 @@ export class CertificatesComponent implements OnInit {
   confirmDeleteCertificate() {
     if (!this.certificateToDelete) return;
 
-    console.log('Deleting certificate with ID:', this.certificateToDelete.id);
-    console.log('Full URL will be:', `${this.certificateService['API_URL']}/${this.certificateToDelete.id}`);
-
     this.certificateService.deleteCertificate(this.certificateToDelete.id).subscribe({
       next: (response) => {
         if (response.success) {
@@ -474,27 +477,22 @@ export class CertificatesComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error deleting certificate - Full error object:', error);
-        console.error('Error status:', error.status);
-        console.error('Error body:', error.error);
-        console.error('Error message:', error.message);
+        console.error('Error deleting certificate:', error);
         
         let errorMessage = 'No se pudo eliminar el certificado.';
         
-        if (error.status === 400) {
-          errorMessage = error.error?.message || 'Solicitud inválida. Verifique que el certificado existe y que tiene permisos para eliminarlo.';
-        } else if (error.status === 401) {
-          errorMessage = 'No tiene autorización para eliminar certificados. Inicie sesión nuevamente.';
-        } else if (error.status === 403) {
-          errorMessage = 'No tiene permisos suficientes para eliminar certificados. Solo los administradores pueden realizar esta acción.';
-        } else if (error.status === 404) {
-          errorMessage = 'El certificado no fue encontrado. Es posible que ya haya sido eliminado.';
-        } else if (error.userMessage) {
-          errorMessage = error.userMessage;
-        } else if (error.error && error.error.message) {
+        if (error.error && error.error.message) {
           errorMessage = error.error.message;
-        } else if (error.message) {
-          errorMessage = error.message;
+        } else if (error.status === 400) {
+          errorMessage = 'Solicitud inválida. El certificado no puede ser eliminado.';
+        } else if (error.status === 401) {
+          errorMessage = 'No tiene autorización para eliminar certificados.';
+        } else if (error.status === 403) {
+          errorMessage = 'No tiene permisos suficientes para eliminar certificados.';
+        } else if (error.status === 404) {
+          errorMessage = 'El certificado no fue encontrado.';
+        } else if (error.status === 500) {
+          errorMessage = 'Error interno del servidor. Inténtelo más tarde.';
         }
         
         this.notificationService.error('Error al eliminar certificado', errorMessage);
@@ -554,6 +552,7 @@ export class CertificatesComponent implements OnInit {
     const user = this.users.find(u => u.id === userId);
     return user && user.dni ? `(${user.dni})` : '';
   }
+
 
   // Form validation helpers
   getFieldError(fieldName: string): string | null {

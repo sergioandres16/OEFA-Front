@@ -62,23 +62,25 @@
       </div>
 
       <div class="filter-group">
-        <label for="dateFrom">Desde</label>
+        <label for="dateFrom">Vigente desde</label>
         <input
           type="date"
           id="dateFrom"
           class="form-control"
           [(ngModel)]="filters.dateFrom"
-          (change)="onFilterChange()">
+          (change)="onFilterChange()"
+          title="Certificados cuya vigencia incluya o termine después de esta fecha">
       </div>
 
       <div class="filter-group">
-        <label for="dateTo">Hasta</label>
+        <label for="dateTo">Vigente hasta</label>
         <input
           type="date"
           id="dateTo"
           class="form-control"
           [(ngModel)]="filters.dateTo"
-          (change)="onFilterChange()">
+          (change)="onFilterChange()"
+          title="Certificados cuya vigencia comience antes o en esta fecha">
       </div>
 
       <div class="filter-actions">
