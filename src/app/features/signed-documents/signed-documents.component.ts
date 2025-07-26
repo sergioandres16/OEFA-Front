@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { SignedDocumentsService, SignedDocument, SignedDocumentListParams } from '../../core/services/signed-documents.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-signed-documents',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, SidebarComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, SidebarComponent],
   templateUrl: './signed-documents.component.html',
   styleUrls: ['./signed-documents.component.css']
 })

@@ -1,3 +1,86 @@
+/* Dashboard Layout Styles */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--gray-50);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 100px;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content.sidebar-expanded {
+  margin-left: 280px;
+}
+
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--gray-600);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.menu-toggle:hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.main-body {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Icon placeholders */
+.icon-menu::before { content: '☰'; }
+.icon-download::before { content: '📥'; }
+.icon-trash::before { content: '🗑️'; }
+.icon-clear::before { content: '🔄'; }
+
+/* Container */
+.signed-documents-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 .page-container {
   padding: 2rem;
   background: var(--gray-50);
