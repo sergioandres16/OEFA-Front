@@ -36,7 +36,9 @@ export class CertificateService {
   }
 
   deleteCertificate(id: number): Observable<ApiResponse> {
-    return this.http.delete<ApiResponse>(`${this.API_URL}/${id}`);
+    const url = `${this.API_URL}/${id}`;
+    console.log('Certificate Service - DELETE URL:', url);
+    return this.http.delete<ApiResponse>(url);
   }
 
   updateCertificate(id: number, updateData: Partial<Certificate>): Observable<ApiResponse<Certificate>> {

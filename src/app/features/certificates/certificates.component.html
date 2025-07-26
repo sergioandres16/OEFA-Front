@@ -33,7 +33,7 @@
           class="form-control"
           [(ngModel)]="filters.search"
           (input)="onFilterChange()"
-          placeholder="Firmante, nombre, sujeto, emisor, DNI...">
+          placeholder="Firmante, nombre, sujeto, emisor, documento...">
       </div>
 
       <div class="filter-group">
@@ -241,9 +241,9 @@
                       
                       <button 
                         class="action-btn"
-                        (click)="onValidateCertificate(certificate)"
-                        title="Validar">
-                        <i class="icon-shield"></i>
+                        (click)="onEditCertificate(certificate)"
+                        title="Editar">
+                        <i class="icon-edit"></i>
                       </button>
                       
                       <button 

@@ -145,12 +145,13 @@ export class CertificatesComponent implements OnInit {
   applyFilters() {
     this.filteredCertificates = this.certificates.filter(cert => {
       const userName = this.getUserName(cert.userId).toLowerCase();
-      const userDni = this.getUserDni(cert.userId).toLowerCase();
+      const user = this.users.find(u => u.id === cert.userId);
+      const userDocument = user && user.dni ? user.dni.toLowerCase() : '';
       
       const matchesSearch = !this.filters.search || 
         cert.fileName.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         userName.includes(this.filters.search.toLowerCase()) ||
-        userDni.includes(this.filters.search.toLowerCase()) ||
+        userDocument.includes(this.filters.search.toLowerCase()) ||
         (cert.subject && cert.subject.toLowerCase().includes(this.filters.search.toLowerCase())) ||
         (cert.subjectCN && cert.subjectCN.toLowerCase().includes(this.filters.search.toLowerCase())) ||
         (cert.issuer && cert.issuer.toLowerCase().includes(this.filters.search.toLowerCase())) ||
@@ -357,9 +358,8 @@ export class CertificatesComponent implements OnInit {
   }
 
   onEditCertificate(certificate: Certificate) {
-    // Funcionalidad de edición eliminada según requerimientos
-    // Se mantiene el método para evitar errores pero no se usa
-    console.log('Edit functionality removed');
+    // TODO: Implementar modal de edición de certificado
+    this.notificationService.info('Funcionalidad en desarrollo', 'La edición de certificados estará disponible próximamente');
   }
 
   // Upload methods
@@ -460,6 +460,9 @@ export class CertificatesComponent implements OnInit {
   confirmDeleteCertificate() {
     if (!this.certificateToDelete) return;
 
+    console.log('Deleting certificate with ID:', this.certificateToDelete.id);
+    console.log('Full URL will be:', `${this.certificateService['API_URL']}/${this.certificateToDelete.id}`);
+
     this.certificateService.deleteCertificate(this.certificateToDelete.id).subscribe({
       next: (response) => {
         if (response.success) {
@@ -471,10 +474,24 @@ export class CertificatesComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error deleting certificate:', error);
+        console.error('Error deleting certificate - Full error object:', error);
+        console.error('Error status:', error.status);
+        console.error('Error body:', error.error);
+        console.error('Error message:', error.message);
         
-        let errorMessage = 'No se pudo eliminar el certificado. Inténtelo nuevamente.';
-        if (error.error && error.error.message) {
+        let errorMessage = 'No se pudo eliminar el certificado.';
+        
+        if (error.status === 400) {
+          errorMessage = error.error?.message || 'Solicitud inválida. Verifique que el certificado existe y que tiene permisos para eliminarlo.';
+        } else if (error.status === 401) {
+          errorMessage = 'No tiene autorización para eliminar certificados. Inicie sesión nuevamente.';
+        } else if (error.status === 403) {
+          errorMessage = 'No tiene permisos suficientes para eliminar certificados. Solo los administradores pueden realizar esta acción.';
+        } else if (error.status === 404) {
+          errorMessage = 'El certificado no fue encontrado. Es posible que ya haya sido eliminado.';
+        } else if (error.userMessage) {
+          errorMessage = error.userMessage;
+        } else if (error.error && error.error.message) {
           errorMessage = error.error.message;
         } else if (error.message) {
           errorMessage = error.message;
@@ -535,7 +552,7 @@ export class CertificatesComponent implements OnInit {
 
   getUserDni(userId: number): string {
     const user = this.users.find(u => u.id === userId);
-    return user ? `DNI: ${user.dni}` : 'DNI: N/A';
+    return user && user.dni ? `(${user.dni})` : '';
   }
 
   // Form validation helpers
