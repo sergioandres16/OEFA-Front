@@ -156,7 +156,7 @@ export class CertificatesComponent implements OnInit {
       // Búsqueda global en múltiples campos
       const searchTerm = this.filters.search.toLowerCase();
       const matchesSearch = !this.filters.search || 
-        cert.fileName.toLowerCase().includes(searchTerm) ||
+        (cert.fileName && cert.fileName.toLowerCase().includes(searchTerm)) ||
         userName.includes(searchTerm) ||
         userDocument.includes(searchTerm) ||
         (cert.subject && cert.subject.toLowerCase().includes(searchTerm)) ||
@@ -207,8 +207,8 @@ export class CertificatesComponent implements OnInit {
       
       switch (this.sortBy) {
         case 'fileName':
-          valueA = a.fileName.toLowerCase();
-          valueB = b.fileName.toLowerCase();
+          valueA = (a.fileName || '').toLowerCase();
+          valueB = (b.fileName || '').toLowerCase();
           break;
         case 'userId':
           valueA = this.getUserName(a.userId).toLowerCase();
