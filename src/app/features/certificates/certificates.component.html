@@ -42,7 +42,7 @@
           id="status"
           class="form-control"
           [(ngModel)]="filters.status"
-          (change)="applyFilters()"
+          (change)="applyFilters()">
           <option value="">Todos los estados</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">
             {{ option.label }}
@@ -58,7 +58,7 @@
           id="dateFrom"
           class="form-control"
           [(ngModel)]="filters.dateFrom"
-          (change)="onFilterChange()"
+          (change)="applyFilters()"
           title="Certificados cuya vigencia incluya o termine después de esta fecha">
       </div>
 
@@ -69,7 +69,7 @@
           id="dateTo"
           class="form-control"
           [(ngModel)]="filters.dateTo"
-          (change)="onFilterChange()"
+          (change)="applyFilters()"
           title="Certificados cuya vigencia comience antes o en esta fecha">
       </div>
 
