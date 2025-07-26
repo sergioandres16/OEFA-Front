@@ -26,7 +26,6 @@ export class CertificatesComponent implements OnInit {
   filters = {
     search: '',
     status: '',
-    issuer: '',
     dateFrom: '',
     dateTo: ''
   };
@@ -136,6 +135,8 @@ export class CertificatesComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data) {
           this.users = response.data.content.filter(user => user.role === 'ROLE_FIRMANTE');
+          // Re-aplicar filtros después de cargar usuarios para que funcione la búsqueda por firmante
+          this.applyFilters();
         }
       },
       error: (error) => {
@@ -146,46 +147,43 @@ export class CertificatesComponent implements OnInit {
 
   applyFilters() {
     this.filteredCertificates = this.certificates.filter(cert => {
-      const userName = this.getUserName(cert.userId).toLowerCase();
+      // Buscar información del firmante
       const user = this.users.find(u => u.id === cert.userId);
+      const userName = user ? `${user.nombre} ${user.apellido}`.toLowerCase() : '';
       const userDocument = user && user.dni ? user.dni.toLowerCase() : '';
       
-      const matchesSearch = !this.filters.search || 
-        cert.fileName.toLowerCase().includes(this.filters.search.toLowerCase()) ||
-        userName.includes(this.filters.search.toLowerCase()) ||
-        userDocument.includes(this.filters.search.toLowerCase()) ||
-        (cert.subject && cert.subject.toLowerCase().includes(this.filters.search.toLowerCase())) ||
-        (cert.subjectCN && cert.subjectCN.toLowerCase().includes(this.filters.search.toLowerCase())) ||
-        (cert.issuer && cert.issuer.toLowerCase().includes(this.filters.search.toLowerCase())) ||
-        (cert.issuerCN && cert.issuerCN.toLowerCase().includes(this.filters.search.toLowerCase())) ||
-        (cert.serialNumber && cert.serialNumber.toLowerCase().includes(this.filters.search.toLowerCase()));
       
+      // Búsqueda global en múltiples campos
+      const searchTerm = this.filters.search.toLowerCase();
+      const matchesSearch = !this.filters.search || 
+        cert.fileName.toLowerCase().includes(searchTerm) ||
+        userName.includes(searchTerm) ||
+        userDocument.includes(searchTerm) ||
+        (cert.subject && cert.subject.toLowerCase().includes(searchTerm)) ||
+        (cert.subjectCN && cert.subjectCN.toLowerCase().includes(searchTerm)) ||
+        (cert.issuer && cert.issuer.toLowerCase().includes(searchTerm)) ||
+        (cert.issuerCN && cert.issuerCN.toLowerCase().includes(searchTerm)) ||
+        (cert.serialNumber && cert.serialNumber.toLowerCase().includes(searchTerm));
+      
+      // Filtro por estado
       const matchesStatus = !this.filters.status || cert.status === this.filters.status;
       
-      const matchesIssuer = !this.filters.issuer || 
-        (cert.issuer && cert.issuer.toLowerCase().includes(this.filters.issuer.toLowerCase())) ||
-        (cert.issuerCN && cert.issuerCN.toLowerCase().includes(this.filters.issuer.toLowerCase()));
-      
-      // Filtra por período de vigencia del certificado (validFrom/validTo)
+      // Filtros por período de vigencia del certificado (validFrom/validTo)
       const matchesDateFrom = !this.filters.dateFrom || 
         (cert.validTo && new Date(cert.validTo) >= new Date(this.filters.dateFrom));
       
       const matchesDateTo = !this.filters.dateTo || 
         (cert.validFrom && new Date(cert.validFrom) <= new Date(this.filters.dateTo + 'T23:59:59'));
       
-      return matchesSearch && matchesStatus && matchesIssuer && matchesDateFrom && matchesDateTo;
+      return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
     });
   }
 
-  onFilterChange() {
-    this.applyFilters();
-  }
 
   clearFilters() {
     this.filters = {
       search: '',
       status: '',
-      issuer: '',
       dateFrom: '',
       dateTo: ''
     };

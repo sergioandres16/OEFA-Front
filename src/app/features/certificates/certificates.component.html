@@ -32,8 +32,8 @@
           id="search"
           class="form-control"
           [(ngModel)]="filters.search"
-          (input)="onFilterChange()"
-          placeholder="Firmante, nombre, sujeto, emisor, documento...">
+          (input)="applyFilters()"
+          placeholder="Buscar por firmante, archivo, sujeto, emisor, documento...">
       </div>
 
       <div class="filter-group">
@@ -42,7 +42,7 @@
           id="status"
           class="form-control"
           [(ngModel)]="filters.status"
-          (change)="onFilterChange()">
+          (change)="applyFilters()"
           <option value="">Todos los estados</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">
             {{ option.label }}
@@ -50,16 +50,6 @@
         </select>
       </div>
 
-      <div class="filter-group">
-        <label for="issuer">Emisor</label>
-        <input
-          type="text"
-          id="issuer"
-          class="form-control"
-          [(ngModel)]="filters.issuer"
-          (input)="onFilterChange()"
-          placeholder="Filtrar por emisor...">
-      </div>
 
       <div class="filter-group">
         <label for="dateFrom">Vigente desde</label>
