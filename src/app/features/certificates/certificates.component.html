@@ -33,7 +33,7 @@
           class="form-control"
           [(ngModel)]="filters.search"
           (input)="applyFilters()"
-          placeholder="Buscar por firmante, archivo, sujeto, emisor, documento...">
+          placeholder="Buscar por firmante, sujeto y emisor">
       </div>
 
       <div class="filter-group">
@@ -90,19 +90,19 @@
                 {{ selectedCertificates.size }} seleccionados
               </span>
             </div>
-            
+
             <div class="table-actions">
-              <button 
+              <button
                 *ngIf="selectedCertificates.size > 0"
                 class="btn btn-outline btn-sm"
                 (click)="onBulkDelete()">
                 <i class="icon-delete"></i>
                 Eliminar Seleccionados
               </button>
-              
+
               <div class="page-size-selector">
                 <label for="pageSize">Mostrar:</label>
-                <select 
+                <select
                   id="pageSize"
                   [(ngModel)]="pageSize"
                   (change)="onPageSizeChange(pageSize)"
@@ -166,7 +166,7 @@
                     </div>
                   </td>
                 </tr>
-                
+
                 <tr *ngIf="!isLoading && filteredCertificates.length === 0" class="empty-row">
                   <td colspan="8" class="text-center">
                     <div class="empty-state">
@@ -176,8 +176,8 @@
                     </div>
                   </td>
                 </tr>
-                
-                <tr *ngFor="let certificate of filteredCertificates; trackBy: trackByCertificate" 
+
+                <tr *ngFor="let certificate of filteredCertificates; trackBy: trackByCertificate"
                     class="certificate-row">
                   <td>
                     <label class="checkbox-label">
@@ -212,7 +212,7 @@
                   <td>
                     <div class="date-info">
                       <div class="date">{{ formatDate(certificate.validTo!) }}</div>
-                      <div class="days-left" 
+                      <div class="days-left"
                            [class.expiring]="isExpiringSoon(certificate.validTo!)"
                            [class.expired]="isExpired(certificate.validTo!)">
                         {{ getDaysUntilExpiration(certificate.validTo!) }}
@@ -224,21 +224,21 @@
                   </td>
                   <td>
                     <div class="actions">
-                      <button 
+                      <button
                         class="action-btn"
                         (click)="onViewCertificate(certificate)"
                         title="Ver detalles">
                         <i class="icon-eye"></i>
                       </button>
-                      
-                      <button 
+
+                      <button
                         class="action-btn"
                         (click)="onEditCertificate(certificate)"
                         title="Editar">
                         <i class="icon-edit"></i>
                       </button>
-                      
-                      <button 
+
+                      <button
                         class="action-btn delete"
                         (click)="onDeleteCertificate(certificate)"
                         title="Eliminar">
@@ -254,28 +254,28 @@
           <!-- Pagination -->
           <div class="pagination-container" *ngIf="totalPages > 1">
             <div class="pagination-info">
-              Mostrando {{ currentPage * pageSize + 1 }} a 
-              {{ getMaxItemsShown() }} de 
+              Mostrando {{ currentPage * pageSize + 1 }} a
+              {{ getMaxItemsShown() }} de
               {{ totalElements }} registros
             </div>
-            
+
             <div class="pagination">
-              <button 
+              <button
                 class="pagination-btn"
                 [disabled]="currentPage === 0"
                 (click)="onPageChange(currentPage - 1)">
                 <i class="icon-chevron-left"></i>
               </button>
-              
-              <button 
+
+              <button
                 *ngFor="let page of getPages()"
                 class="pagination-btn"
                 [class.active]="page === currentPage"
                 (click)="onPageChange(page)">
                 {{ page + 1 }}
               </button>
-              
-              <button 
+
+              <button
                 class="pagination-btn"
                 [disabled]="currentPage === totalPages - 1"
                 (click)="onPageChange(currentPage + 1)">
@@ -298,7 +298,7 @@
         <i class="icon-close"></i>
       </button>
     </div>
-    
+
     <form [formGroup]="uploadForm" (ngSubmit)="onUploadSubmit()" class="modal-body">
       <div class="form-grid">
         <div class="form-group">
@@ -369,11 +369,11 @@
         <i class="icon-close"></i>
       </button>
     </div>
-    
+
     <div class="modal-body">
       <p>¿Está seguro de que desea eliminar el certificado "{{ certificateToDelete?.fileName }}"?</p>
       <p class="text-warning">Esta acción no se puede deshacer.</p>
-      
+
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
