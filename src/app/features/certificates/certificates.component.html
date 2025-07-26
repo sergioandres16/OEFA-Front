@@ -33,7 +33,7 @@
           class="form-control"
           [(ngModel)]="filters.search"
           (input)="onFilterChange()"
-          placeholder="Nombre, sujeto, emisor o serial...">
+          placeholder="Firmante, nombre, sujeto, emisor, DNI...">
       </div>
 
       <div class="filter-group">
@@ -138,9 +138,9 @@
                       <span class="checkbox-custom"></span>
                     </label>
                   </th>
-                  <th class="sortable" (click)="onSort('fileUuid')">
-                    UUID del Archivo
-                    <span class="sort-icon">{{ getSortIcon('fileUuid') }}</span>
+                  <th class="sortable" (click)="onSort('userId')">
+                    Firmante
+                    <span class="sort-icon">{{ getSortIcon('userId') }}</span>
                   </th>
                   <th class="sortable" (click)="onSort('subjectCN')">
                     Sujeto
@@ -198,8 +198,9 @@
                     </label>
                   </td>
                   <td>
-                    <div class="file-info">
-                      <div class="file-name">{{ certificate.fileUuid }}</div>
+                    <div class="firmante-info">
+                      <div class="firmante-name">{{ getUserName(certificate.userId) }}</div>
+                      <div class="firmante-dni">{{ getUserDni(certificate.userId) }}</div>
                     </div>
                   </td>
                   <td>
@@ -236,13 +237,6 @@
                         (click)="onViewCertificate(certificate)"
                         title="Ver detalles">
                         <i class="icon-eye"></i>
-                      </button>
-                      
-                      <button 
-                        class="action-btn"
-                        (click)="onEditCertificate(certificate)"
-                        title="Editar">
-                        <i class="icon-edit"></i>
                       </button>
                       
                       <button 

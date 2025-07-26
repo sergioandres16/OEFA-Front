@@ -39,8 +39,20 @@ export class CertificateService {
     return this.http.delete<ApiResponse>(`${this.API_URL}/${id}`);
   }
 
+  updateCertificate(id: number, updateData: Partial<Certificate>): Observable<ApiResponse<Certificate>> {
+    return this.http.put<ApiResponse<Certificate>>(`${this.API_URL}/${id}`, updateData);
+  }
+
+  getCertificatesExpiringSoon(): Observable<ApiResponse<Certificate[]>> {
+    return this.http.get<ApiResponse<Certificate[]>>(`${this.API_URL}/expiring-soon`);
+  }
+
+  getCertificateStats(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.API_URL}/stats`);
+  }
+
   validateCertificate(id: number): Observable<ApiResponse> {
-    // Mock para desarrollo
+    // Mock para desarrollo - En producción debería conectar con el endpoint real
     const mockResponse: ApiResponse = {
       success: true,
       message: 'Certificado validado exitosamente',

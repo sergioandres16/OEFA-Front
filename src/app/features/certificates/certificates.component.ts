@@ -144,16 +144,24 @@ export class CertificatesComponent implements OnInit {
 
   applyFilters() {
     this.filteredCertificates = this.certificates.filter(cert => {
+      const userName = this.getUserName(cert.userId).toLowerCase();
+      const userDni = this.getUserDni(cert.userId).toLowerCase();
+      
       const matchesSearch = !this.filters.search || 
         cert.fileName.toLowerCase().includes(this.filters.search.toLowerCase()) ||
+        userName.includes(this.filters.search.toLowerCase()) ||
+        userDni.includes(this.filters.search.toLowerCase()) ||
         (cert.subject && cert.subject.toLowerCase().includes(this.filters.search.toLowerCase())) ||
+        (cert.subjectCN && cert.subjectCN.toLowerCase().includes(this.filters.search.toLowerCase())) ||
         (cert.issuer && cert.issuer.toLowerCase().includes(this.filters.search.toLowerCase())) ||
+        (cert.issuerCN && cert.issuerCN.toLowerCase().includes(this.filters.search.toLowerCase())) ||
         (cert.serialNumber && cert.serialNumber.toLowerCase().includes(this.filters.search.toLowerCase()));
       
       const matchesStatus = !this.filters.status || cert.status === this.filters.status;
       
       const matchesIssuer = !this.filters.issuer || 
-        (cert.issuer && cert.issuer.toLowerCase().includes(this.filters.issuer.toLowerCase()));
+        (cert.issuer && cert.issuer.toLowerCase().includes(this.filters.issuer.toLowerCase())) ||
+        (cert.issuerCN && cert.issuerCN.toLowerCase().includes(this.filters.issuer.toLowerCase()));
       
       const matchesDateFrom = !this.filters.dateFrom || 
         new Date(cert.uploadedAt!) >= new Date(this.filters.dateFrom);
@@ -200,6 +208,18 @@ export class CertificatesComponent implements OnInit {
           valueA = a.fileName.toLowerCase();
           valueB = b.fileName.toLowerCase();
           break;
+        case 'userId':
+          valueA = this.getUserName(a.userId).toLowerCase();
+          valueB = this.getUserName(b.userId).toLowerCase();
+          break;
+        case 'subjectCN':
+          valueA = (a.subjectCN || '').toLowerCase();
+          valueB = (b.subjectCN || '').toLowerCase();
+          break;
+        case 'issuerCN':
+          valueA = (a.issuerCN || '').toLowerCase();
+          valueB = (b.issuerCN || '').toLowerCase();
+          break;
         case 'subject':
           valueA = (a.subject || '').toLowerCase();
           valueB = (b.subject || '').toLowerCase();
@@ -215,6 +235,10 @@ export class CertificatesComponent implements OnInit {
         case 'uploadedAt':
           valueA = new Date(a.uploadedAt!);
           valueB = new Date(b.uploadedAt!);
+          break;
+        case 'createdAt':
+          valueA = new Date(a.createdAt!);
+          valueB = new Date(b.createdAt!);
           break;
         case 'validTo':
           valueA = new Date(a.validTo!);
@@ -333,8 +357,9 @@ export class CertificatesComponent implements OnInit {
   }
 
   onEditCertificate(certificate: Certificate) {
-    // TODO: Implement edit functionality
-    this.notificationService.info('Funcionalidad no disponible', 'La edición de certificados no está implementada aún');
+    // Funcionalidad de edición eliminada según requerimientos
+    // Se mantiene el método para evitar errores pero no se usa
+    console.log('Edit functionality removed');
   }
 
   // Upload methods
@@ -506,6 +531,11 @@ export class CertificatesComponent implements OnInit {
   getUserName(userId: number): string {
     const user = this.users.find(u => u.id === userId);
     return user ? `${user.nombre} ${user.apellido}` : `ID: ${userId}`;
+  }
+
+  getUserDni(userId: number): string {
+    const user = this.users.find(u => u.id === userId);
+    return user ? `DNI: ${user.dni}` : 'DNI: N/A';
   }
 
   // Form validation helpers
