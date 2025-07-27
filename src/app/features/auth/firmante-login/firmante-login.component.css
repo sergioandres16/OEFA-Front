@@ -114,6 +114,13 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.logo-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
 .login-title {
   font-size: 1.5rem;
   font-weight: 600;

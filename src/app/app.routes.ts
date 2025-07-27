@@ -28,11 +28,6 @@ export const routes: Routes = [
     canActivate: [FirmanteNoAuthGuard]
   },
   {
-    path: 'activate',
-    loadComponent: () => import('./features/auth/activate/activate.component').then(c => c.ActivateComponent),
-    canActivate: [NoAuthGuard]
-  },
-  {
     path: 'dashboard',
     loadComponent: () => import('./features/dashboard/dashboard.component').then(c => c.DashboardComponent),
     canActivate: [AuthGuard]
