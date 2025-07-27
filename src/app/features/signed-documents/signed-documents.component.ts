@@ -32,14 +32,6 @@ export class SignedDocumentsComponent implements OnInit {
   totalElements = 0;
   totalPages = 0;
 
-  // Filter options
-  documentTypeOptions = [
-    { value: '', label: 'Todos los tipos' },
-    { value: 'PDF', label: 'PDF' },
-    { value: 'DOCX', label: 'DOCX' },
-    { value: 'XLSX', label: 'XLSX' },
-    { value: 'TXT', label: 'TXT' }
-  ];
 
   constructor(
     private fb: FormBuilder,
@@ -59,9 +51,8 @@ export class SignedDocumentsComponent implements OnInit {
   createFilterForm(): FormGroup {
     return this.fb.group({
       search: [''],
-      documentType: [''],
-      userId: [''],
-      dni: ['']
+      dateFrom: [''],
+      dateTo: ['']
     });
   }
 
@@ -119,30 +110,41 @@ export class SignedDocumentsComponent implements OnInit {
     const filters = this.filterForm.value;
     let filtered = [...this.documents];
 
-    // Search filter
+    // Global search filter - busca en múltiples campos
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
+      filtered = filtered.filter(doc => {
+        // Buscar información del firmante
+        const user = this.users.find(u => u.id === doc.userId);
+        const userName = user ? `${user.nombre} ${user.apellido}`.toLowerCase() : '';
+        const userEmail = user ? user.email.toLowerCase() : '';
+        
+        return (
+          (doc.fileName && doc.fileName.toLowerCase().includes(searchTerm)) ||
+          (doc.dni && doc.dni.toLowerCase().includes(searchTerm)) ||
+          (doc.motivo && doc.motivo.toLowerCase().includes(searchTerm)) ||
+          (doc.cargoFirmante && doc.cargoFirmante.toLowerCase().includes(searchTerm)) ||
+          userName.includes(searchTerm) ||
+          userEmail.includes(searchTerm) ||
+          (doc.documentPath && doc.documentPath.toLowerCase().includes(searchTerm))
+        );
+      });
+    }
+
+    // Date from filter (createdAt)
+    if (filters.dateFrom) {
+      const fromDate = new Date(filters.dateFrom);
       filtered = filtered.filter(doc => 
-        (doc.fileName && doc.fileName.toLowerCase().includes(searchTerm)) ||
-        (doc.dni && doc.dni.toLowerCase().includes(searchTerm)) ||
-        (doc.motivo && doc.motivo.toLowerCase().includes(searchTerm)) ||
-        (doc.cargoFirmante && doc.cargoFirmante.toLowerCase().includes(searchTerm))
+        doc.createdAt && new Date(doc.createdAt) >= fromDate
       );
     }
 
-    // Document type filter
-    if (filters.documentType) {
-      filtered = filtered.filter(doc => doc.documentType === filters.documentType);
-    }
-
-    // User filter
-    if (filters.userId) {
-      filtered = filtered.filter(doc => doc.userId === parseInt(filters.userId));
-    }
-
-    // DNI filter
-    if (filters.dni) {
-      filtered = filtered.filter(doc => doc.dni && doc.dni.includes(filters.dni));
+    // Date to filter (createdAt)
+    if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo + 'T23:59:59');
+      filtered = filtered.filter(doc => 
+        doc.createdAt && new Date(doc.createdAt) <= toDate
+      );
     }
 
     this.filteredDocuments = filtered;

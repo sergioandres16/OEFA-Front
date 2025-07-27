@@ -13,12 +13,6 @@
       </div>
 
       <div class="header-right">
-        <div class="filter-actions">
-          <button class="btn btn-secondary" (click)="clearFilters()">
-            <i class="icon-clear"></i>
-            Limpiar Filtros
-          </button>
-        </div>
       </div>
     </header>
 
@@ -35,37 +29,29 @@
                 formControlName="search"
                 class="form-control"
                 (input)="applyFilters()"
-                placeholder="Buscar por archivo, DNI, motivo, cargo...">
+                placeholder="Buscar por archivo, firmante, DNI, motivo, cargo...">
             </div>
             
             <div class="filter-group">
-              <label for="documentType">Tipo de Documento</label>
-              <select id="documentType" formControlName="documentType" class="form-control" (change)="applyFilters()">
-                <option *ngFor="let option of documentTypeOptions" [value]="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label for="userId">Firmante</label>
-              <select id="userId" formControlName="userId" class="form-control" (change)="applyFilters()">
-                <option value="">Todos los firmantes</option>
-                <option *ngFor="let user of users" [value]="user.id">
-                  {{ user.nombre }} {{ user.apellido }}
-                </option>
-              </select>
-            </div>
-            
-            <div class="filter-group">
-              <label for="dni">DNI</label>
+              <label for="dateFrom">Creado desde</label>
               <input
-                id="dni"
-                type="text"
-                formControlName="dni"
+                type="date"
+                id="dateFrom"
+                formControlName="dateFrom"
                 class="form-control"
-                (input)="applyFilters()"
-                placeholder="Buscar por DNI...">
+                (change)="applyFilters()"
+                title="Documentos creados desde esta fecha">
+            </div>
+
+            <div class="filter-group">
+              <label for="dateTo">Creado hasta</label>
+              <input
+                type="date"
+                id="dateTo"
+                formControlName="dateTo"
+                class="form-control"
+                (change)="applyFilters()"
+                title="Documentos creados hasta esta fecha">
             </div>
 
             <div class="filter-actions">
@@ -112,10 +98,10 @@
               <thead>
                 <tr>
                   <th>Documento</th>
-                  <th>Tipo</th>
                   <th>Firmante</th>
                   <th>DNI</th>
                   <th>Fecha de Firma</th>
+                  <th>Fecha de Creación</th>
                   <th>Estado</th>
                   <th>Tamaño</th>
                   <th class="actions-col">Acciones</th>
@@ -151,9 +137,6 @@
                     </div>
                   </td>
                   <td>
-                    <span class="document-type-badge">{{ document.documentType || 'N/A' }}</span>
-                  </td>
-                  <td>
                     <div class="signer-info">
                       <div class="signer-name">{{ getUserName(document.userId) }}</div>
                       <div class="signer-email">{{ getUserEmail(document.userId) }}</div>
@@ -164,6 +147,9 @@
                   </td>
                   <td class="date-column">
                     {{ formatDate(document.signatureDate) }}
+                  </td>
+                  <td class="date-column">
+                    {{ formatDate(document.createdAt) }}
                   </td>
                   <td>
                     <span class="badge" [class]="getStatusBadgeClass(document.status)">
