@@ -7,7 +7,7 @@
   --secondary-teal: #6AC3AB;
   --secondary-green: #92C85F;
   
-  --gradient-primary: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+  --gradient-primary: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
   --gradient-secondary: linear-gradient(135deg, var(--secondary-teal) 0%, var(--secondary-green) 100%);
   
   --white: #ffffff;
