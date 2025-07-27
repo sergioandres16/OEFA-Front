@@ -397,7 +397,119 @@
   line-height: 1.5;
 }
 
-/* Enhanced Styles for New Dashboard */
+/* Simplified Dashboard Styles */
+
+/* Platform Description */
+.platform-description {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--gray-50);
+  border-radius: var(--border-radius-lg);
+  border-left: 4px solid var(--secondary-teal);
+}
+
+.platform-description p {
+  color: var(--gray-700);
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+/* Stats Overview */
+.stats-overview {
+  margin-bottom: 2rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-breakdown {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.stat-breakdown span {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.active-count { background: rgba(146, 200, 95, 0.1); color: var(--secondary-green); }
+.pending-count { background: rgba(251, 191, 36, 0.1); color: #f59e0b; }
+.valid-count { background: rgba(106, 195, 171, 0.1); color: var(--secondary-teal); }
+.invalid-count { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+.signed-count { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.visado-count { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+
+/* Modules Overview */
+.modules-overview {
+  margin-bottom: 2rem;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.module-card {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  display: flex;
+  gap: 1.5rem;
+  transition: var(--transition);
+}
+
+.module-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.module-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.users-module {
+  background: var(--gradient-primary);
+}
+
+.certificates-module {
+  background: var(--gradient-secondary);
+}
+
+.documents-module {
+  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+}
+
+.module-content h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin: 0 0 1rem 0;
+}
+
+.module-content p {
+  color: var(--gray-600);
+  line-height: 1.5;
+  margin: 0;
+  font-size: 0.9375rem;
+}
 
 /* Loading and Error States */
 .loading-state, .error-state {
