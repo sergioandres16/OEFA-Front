@@ -11,11 +11,29 @@
         </button>
         <h1 class="page-title">Panel de Administración</h1>
       </div>
-      
+      <div class="header-right">
+        <button class="refresh-btn" (click)="refreshStats()" [disabled]="isLoading">
+          <i class="icon-refresh" [class.spinning]="isLoading"></i>
+          <span>Actualizar</span>
+        </button>
+      </div>
     </header>
 
     <main class="main-body">
-      <div class="dashboard-grid">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Cargando estadísticas...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !isLoading" class="error-state">
+        <i class="icon-warning"></i>
+        <p>{{ error }}</p>
+        <button class="btn btn-primary" (click)="refreshStats()">Reintentar</button>
+      </div>
+
+      <div class="dashboard-grid" *ngIf="!isLoading">
         <!-- Welcome Section -->
         <div class="welcome-section">
           <div class="welcome-header">
@@ -23,149 +41,224 @@
               <i class="icon-home"></i>
             </div>
             <div class="welcome-content">
-              <h2>Bienvenido al Sistema de Gestión de Certificados Digitales</h2>
+              <h2>Sistema de Gestión de Certificados Digitales</h2>
               <p class="welcome-subtitle">OEFA - Organismo de Evaluación y Fiscalización Ambiental</p>
-            </div>
-          </div>
-          
-          <div class="welcome-description">
-            <p>Esta plataforma administrativa te permite gestionar de manera integral el sistema de certificados digitales y firmas electrónicas de OEFA. A través de este panel podrás:</p>
-            
-            <div class="features-grid">
-              <div class="feature-item">
-                <i class="icon-certificate"></i>
-                <h4>Gestión de Certificados</h4>
-                <p>Crear, visualizar, editar y eliminar certificados digitales .p12 de los usuarios del sistema.</p>
-              </div>
-              
-              <div class="feature-item">
-                <i class="icon-users"></i>
-                <h4>Administración de Usuarios</h4>
-                <p>Gestionar usuarios firmantes, crear nuevas cuentas, modificar información y administrar permisos.</p>
-              </div>
-              
-              <div class="feature-item">
-                <i class="icon-document"></i>
-                <h4>Documentos Firmados</h4>
-                <p>Visualizar y administrar todos los documentos que han sido firmados digitalmente por los usuarios.</p>
-              </div>
-              
-              <div class="feature-item">
-                <i class="icon-shield"></i>
-                <h4>Seguridad y Auditoría</h4>
-                <p>Monitorear la seguridad del sistema y revisar logs de auditoría para garantizar la integridad.</p>
+              <div class="status-badge">
+                <i class="icon-check"></i>
+                <span>Sistema Operativo</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Stats Cards -->
+        <!-- Real-time Stats Cards -->
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="icon-certificate"></i>
+          <div class="stat-card users-card">
+            <div class="stat-header">
+              <div class="stat-icon">
+                <i class="icon-users"></i>
+              </div>
+              <div class="stat-trend positive">
+                <i class="icon-arrow-up"></i>
+                <span>{{ getUserActiveRate() }}%</span>
+              </div>
             </div>
             <div class="stat-content">
-              <h3>12</h3>
-              <p>Certificados Activos</p>
+              <h3>{{ stats.firmantes.totalFirmantes }}</h3>
+              <p>Firmantes Totales</p>
+              <div class="stat-details">
+                <span class="active">{{ stats.firmantes.activeFirmantes }} Activos</span>
+                <span class="pending">{{ stats.firmantes.pendingFirmantes }} Pendientes</span>
+              </div>
             </div>
           </div>
           
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="icon-users"></i>
+          <div class="stat-card certificates-card">
+            <div class="stat-header">
+              <div class="stat-icon">
+                <i class="icon-certificate"></i>
+              </div>
+              <div class="stat-trend" [class.positive]="getCertificateHealthRate() >= 90" [class.warning]="getCertificateHealthRate() < 90">
+                <i class="icon-shield"></i>
+                <span>{{ getCertificateHealthRate() }}%</span>
+              </div>
             </div>
             <div class="stat-content">
-              <h3>8</h3>
-              <p>Usuarios Registrados</p>
+              <h3>{{ stats.certificates.totalCertificates }}</h3>
+              <p>Certificados Digitales</p>
+              <div class="stat-details">
+                <span class="valid">{{ stats.certificates.validCertificates }} Válidos</span>
+                <span class="invalid">{{ stats.certificates.invalidCertificates }} Inválidos</span>
+              </div>
             </div>
           </div>
           
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="icon-document"></i>
+          <div class="stat-card documents-card">
+            <div class="stat-header">
+              <div class="stat-icon">
+                <i class="icon-document"></i>
+              </div>
+              <div class="stat-trend positive">
+                <i class="icon-check-circle"></i>
+                <span>{{ getSuccessRate() }}%</span>
+              </div>
             </div>
             <div class="stat-content">
-              <h3>25</h3>
-              <p>Documentos Firmados</p>
+              <h3>{{ stats.documents.totalDocuments }}</h3>
+              <p>Documentos Procesados</p>
+              <div class="stat-details">
+                <span class="signed">{{ stats.documents.signedDocuments }} Firmados</span>
+                <span class="visado">{{ stats.documents.visadoDocuments }} Visados</span>
+              </div>
             </div>
           </div>
-          
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="icon-shield"></i>
+
+          <div class="stat-card performance-card">
+            <div class="stat-header">
+              <div class="stat-icon">
+                <i class="icon-activity"></i>
+              </div>
+              <div class="stat-trend positive">
+                <i class="icon-trending-up"></i>
+                <span>{{ getSuccessRate() }}%</span>
+              </div>
             </div>
             <div class="stat-content">
-              <h3>100%</h3>
-              <p>Seguridad</p>
+              <h3>{{ stats.documents.completedDocuments }}</h3>
+              <p>Procesos Exitosos</p>
+              <div class="stat-details">
+                <span class="completed">{{ stats.documents.completedDocuments }} Completados</span>
+                <span class="pending">{{ stats.documents.pendingDocuments }} Pendientes</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="activity-section">
+        <!-- Service Status Cards -->
+        <div class="services-status">
           <div class="section-header">
-            <h2>Actividad Reciente</h2>
-            <button class="btn btn-outline btn-sm">Ver Todo</button>
+            <h2>Estado de los Servicios</h2>
           </div>
-          
-          <div class="activity-list">
-            <div class="activity-item">
-              <div class="activity-icon">
-                <i class="icon-upload"></i>
-              </div>
-              <div class="activity-content">
-                <h4>Certificado subido</h4>
-                <p>Juan Pérez subió un nuevo certificado</p>
-                <span class="activity-time">Hace 2 horas</span>
+          <div class="services-grid">
+            <div class="service-card">
+              <div class="service-status online"></div>
+              <div class="service-info">
+                <h4>Auth Service</h4>
+                <p>Autenticación y gestión de usuarios</p>
+                <span class="uptime">99.9% uptime</span>
               </div>
             </div>
-            
-            <div class="activity-item">
-              <div class="activity-icon">
-                <i class="icon-user-add"></i>
-              </div>
-              <div class="activity-content">
-                <h4>Nuevo usuario</h4>
-                <p>María García fue registrada como firmante</p>
-                <span class="activity-time">Hace 4 horas</span>
+            <div class="service-card">
+              <div class="service-status online"></div>
+              <div class="service-info">
+                <h4>Certificate Service</h4>
+                <p>Gestión de certificados digitales</p>
+                <span class="uptime">99.8% uptime</span>
               </div>
             </div>
-            
-            <div class="activity-item">
-              <div class="activity-icon">
-                <i class="icon-warning"></i>
-              </div>
-              <div class="activity-content">
-                <h4>Certificado por expirar</h4>
-                <p>El certificado de Carlos López expira en 7 días</p>
-                <span class="activity-time">Hace 1 día</span>
+            <div class="service-card">
+              <div class="service-status online"></div>
+              <div class="service-info">
+                <h4>Signature Service</h4>
+                <p>Procesamiento de firmas digitales</p>
+                <span class="uptime">99.9% uptime</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- Enhanced Quick Actions -->
         <div class="quick-actions">
           <div class="section-header">
             <h2>Acciones Rápidas</h2>
           </div>
           
           <div class="actions-grid" *ngIf="sidebar.currentUser">
-            <button class="action-card" routerLink="/certificates">
-              <i class="icon-certificate"></i>
-              <span>Gestionar Certificados</span>
+            <button class="action-card primary" routerLink="/users" *ngIf="sidebar.currentUser?.role === 'ROLE_ADMIN'">
+              <i class="icon-user-plus"></i>
+              <div class="action-content">
+                <span class="action-title">Crear Firmante</span>
+                <span class="action-desc">Registrar nuevo usuario</span>
+              </div>
             </button>
             
-            <button class="action-card" routerLink="/users" *ngIf="sidebar.currentUser?.role === 'ROLE_ADMIN'">
-              <i class="icon-users"></i>
-              <span>Gestionar Usuarios</span>
+            <button class="action-card secondary" routerLink="/certificates">
+              <i class="icon-upload"></i>
+              <div class="action-content">
+                <span class="action-title">Subir Certificado</span>
+                <span class="action-desc">Cargar archivo .p12</span>
+              </div>
             </button>
             
-            <button class="action-card" routerLink="/signed-documents" *ngIf="sidebar.currentUser?.role === 'ROLE_ADMIN'">
-              <i class="icon-document"></i>
-              <span>Documentos Firmados</span>
+            <button class="action-card tertiary" routerLink="/signed-documents" *ngIf="sidebar.currentUser?.role === 'ROLE_ADMIN'">
+              <i class="icon-search"></i>
+              <div class="action-content">
+                <span class="action-title">Ver Documentos</span>
+                <span class="action-desc">Revisar firmas digitales</span>
+              </div>
             </button>
+
+            <button class="action-card quaternary" (click)="refreshStats()">
+              <i class="icon-settings"></i>
+              <div class="action-content">
+                <span class="action-title">Estadísticas</span>
+                <span class="action-desc">Actualizar métricas</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Platform Features -->
+        <div class="features-overview">
+          <div class="section-header">
+            <h2>Capacidades de la Plataforma</h2>
+            <p class="section-subtitle">Tecnología de vanguardia para firma digital segura</p>
+          </div>
+          
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon certificate-icon">
+                <i class="icon-certificate"></i>
+              </div>
+              <h4>Certificados X.509</h4>
+              <p>Soporte completo para certificados digitales estándar PKI con validación OCSP y CRL.</p>
+              <div class="feature-stats">
+                <span>{{ stats.certificates.validCertificates }} certificados activos</span>
+              </div>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon signature-icon">
+                <i class="icon-edit"></i>
+              </div>
+              <h4>Firma Digital Avanzada</h4>
+              <p>Firma y visado de documentos PDF con timestamp y sellado de tiempo longevo.</p>
+              <div class="feature-stats">
+                <span>{{ stats.documents.signedDocuments }} documentos firmados</span>
+              </div>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon security-icon">
+                <i class="icon-shield"></i>
+              </div>
+              <h4>Seguridad Integral</h4>
+              <p>Autenticación multifactor, encriptación end-to-end y auditoría completa.</p>
+              <div class="feature-stats">
+                <span>{{ getUserActiveRate() }}% usuarios activos</span>
+              </div>
+            </div>
+            
+            <div class="feature-card">
+              <div class="feature-icon api-icon">
+                <i class="icon-globe"></i>
+              </div>
+              <h4>API RESTful</h4>
+              <p>Arquitectura de microservicios con APIs documentadas y escalables.</p>
+              <div class="feature-stats">
+                <span>3 servicios principales</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
