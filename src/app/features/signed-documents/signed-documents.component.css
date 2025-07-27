@@ -178,6 +178,23 @@
   border-bottom: 1px solid var(--gray-200);
   font-size: 0.875rem;
   white-space: nowrap;
+  position: relative;
+}
+
+.table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.table th.sortable:hover {
+  background: var(--gray-100);
+}
+
+.sort-icon {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--gray-500);
 }
 
 .table td {
@@ -210,37 +227,21 @@
   font-size: 0.75rem;
   color: var(--gray-500);
   font-family: monospace;
-  background: var(--gray-100);
-  padding: 0.125rem 0.375rem;
-  border-radius: 3px;
-  display: inline-block;
 }
 
-/* Document Type Badge */
-.document-type-badge {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  background: var(--secondary-teal);
-  color: var(--white);
-  border-radius: var(--border-radius);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-/* Signer Info */
-.signer-info {
+/* Firmante Info */
+.firmante-info {
   min-width: 200px;
 }
 
-.signer-name {
+.firmante-name {
   font-weight: 500;
   color: var(--gray-800);
   margin-bottom: 0.25rem;
   line-height: 1.4;
 }
 
-.signer-email {
+.firmante-email {
   font-size: 0.75rem;
   color: var(--gray-600);
 }
@@ -250,19 +251,18 @@
   font-family: monospace;
   font-weight: 500;
   color: var(--gray-700);
+  font-size: 0.875rem;
 }
 
-/* Date Column */
-.date-column {
-  min-width: 130px;
+/* Date */
+.date {
   font-size: 0.875rem;
   color: var(--gray-700);
   white-space: nowrap;
 }
 
-/* Size Column */
-.size-column {
-  min-width: 80px;
+/* File Size */
+.file-size {
   font-size: 0.875rem;
   color: var(--gray-700);
   text-align: right;
@@ -667,5 +667,10 @@
 
   .page-title {
     font-size: 1.25rem;
+  }
+
+  .document-info,
+  .firmante-info {
+    min-width: auto;
   }
 }

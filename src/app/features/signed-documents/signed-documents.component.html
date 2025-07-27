@@ -97,13 +97,34 @@
             <table *ngIf="!isLoading" class="table">
               <thead>
                 <tr>
-                  <th>Documento</th>
-                  <th>Firmante</th>
-                  <th>DNI</th>
-                  <th>Fecha de Firma</th>
-                  <th>Fecha de Creación</th>
-                  <th>Estado</th>
-                  <th>Tamaño</th>
+                  <th class="sortable" (click)="onSort('fileName')">
+                    Documento
+                    <span class="sort-icon">{{ getSortIcon('fileName') }}</span>
+                  </th>
+                  <th class="sortable" (click)="onSort('userId')">
+                    Firmante
+                    <span class="sort-icon">{{ getSortIcon('userId') }}</span>
+                  </th>
+                  <th class="sortable" (click)="onSort('dni')">
+                    DNI
+                    <span class="sort-icon">{{ getSortIcon('dni') }}</span>
+                  </th>
+                  <th class="sortable" (click)="onSort('signatureDate')">
+                    Fecha de Firma
+                    <span class="sort-icon">{{ getSortIcon('signatureDate') }}</span>
+                  </th>
+                  <th class="sortable" (click)="onSort('createdAt')">
+                    Fecha de Creación
+                    <span class="sort-icon">{{ getSortIcon('createdAt') }}</span>
+                  </th>
+                  <th class="sortable" (click)="onSort('status')">
+                    Estado
+                    <span class="sort-icon">{{ getSortIcon('status') }}</span>
+                  </th>
+                  <th class="sortable" (click)="onSort('documentSize')">
+                    Tamaño
+                    <span class="sort-icon">{{ getSortIcon('documentSize') }}</span>
+                  </th>
                   <th class="actions-col">Acciones</th>
                 </tr>
               </thead>
@@ -131,33 +152,31 @@
                   <td>
                     <div class="document-info">
                       <div class="document-name">{{ document.fileName || 'N/A' }}</div>
-                      <div class="document-path" *ngIf="document.documentPath">
-                        <small>{{ document.documentPath }}</small>
-                      </div>
+                      <div class="document-path" *ngIf="document.documentPath">{{ document.documentPath }}</div>
                     </div>
                   </td>
                   <td>
-                    <div class="signer-info">
-                      <div class="signer-name">{{ getUserName(document.userId) }}</div>
-                      <div class="signer-email">{{ getUserEmail(document.userId) }}</div>
+                    <div class="firmante-info">
+                      <div class="firmante-name">{{ getUserName(document.userId) }}</div>
+                      <div class="firmante-email">{{ getUserEmail(document.userId) }}</div>
                     </div>
                   </td>
                   <td>
                     <div class="dni-info">{{ document.dni || 'N/A' }}</div>
                   </td>
-                  <td class="date-column">
-                    {{ formatDate(document.signatureDate) }}
+                  <td>
+                    <div class="date">{{ formatDate(document.signatureDate) }}</div>
                   </td>
-                  <td class="date-column">
-                    {{ formatDate(document.createdAt) }}
+                  <td>
+                    <div class="date">{{ formatDate(document.createdAt) }}</div>
                   </td>
                   <td>
                     <span class="badge" [class]="getStatusBadgeClass(document.status)">
                       {{ getStatusDisplayName(document.status) }}
                     </span>
                   </td>
-                  <td class="size-column">
-                    {{ formatFileSize(document.documentSize) }}
+                  <td>
+                    <div class="file-size">{{ formatFileSize(document.documentSize) }}</div>
                   </td>
                   <td>
                     <div class="actions">

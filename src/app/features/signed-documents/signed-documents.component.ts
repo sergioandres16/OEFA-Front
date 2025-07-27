@@ -32,6 +32,10 @@ export class SignedDocumentsComponent implements OnInit {
   totalElements = 0;
   totalPages = 0;
 
+  // Sorting
+  sortBy = 'createdAt';
+  sortDirection: 'asc' | 'desc' = 'desc';
+
 
   constructor(
     private fb: FormBuilder,
@@ -148,6 +152,70 @@ export class SignedDocumentsComponent implements OnInit {
     }
 
     this.filteredDocuments = filtered;
+    this.applySorting();
+  }
+
+  onSort(column: string) {
+    if (this.sortBy === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = column;
+      this.sortDirection = 'asc';
+    }
+    this.applySorting();
+  }
+
+  applySorting() {
+    this.filteredDocuments.sort((a, b) => {
+      let valueA: any;
+      let valueB: any;
+      
+      switch (this.sortBy) {
+        case 'fileName':
+          valueA = (a.fileName || '').toLowerCase();
+          valueB = (b.fileName || '').toLowerCase();
+          break;
+        case 'userId':
+          valueA = this.getUserName(a.userId).toLowerCase();
+          valueB = this.getUserName(b.userId).toLowerCase();
+          break;
+        case 'dni':
+          valueA = (a.dni || '').toLowerCase();
+          valueB = (b.dni || '').toLowerCase();
+          break;
+        case 'signatureDate':
+          valueA = new Date(a.signatureDate);
+          valueB = new Date(b.signatureDate);
+          break;
+        case 'createdAt':
+          valueA = new Date(a.createdAt);
+          valueB = new Date(b.createdAt);
+          break;
+        case 'status':
+          valueA = a.status;
+          valueB = b.status;
+          break;
+        case 'documentSize':
+          valueA = a.documentSize;
+          valueB = b.documentSize;
+          break;
+        default:
+          return 0;
+      }
+      
+      if (valueA < valueB) {
+        return this.sortDirection === 'asc' ? -1 : 1;
+      }
+      if (valueA > valueB) {
+        return this.sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+
+  getSortIcon(column: string): string {
+    if (this.sortBy !== column) return '↕️';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   onPageChange(page: number) {
