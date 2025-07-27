@@ -114,9 +114,7 @@ export class UsersComponent implements OnInit {
           this.totalPages = Math.ceil(firmantesOnly.length / this.pageSize);
           this.currentPage = response.data.page;
           this.applyFilters();
-          console.log('Firmantes loaded:', firmantesOnly);
         } else {
-          console.error('Error in API response:', response.message);
           this.users = [];
         }
         this.isLoading = false;
@@ -305,7 +303,6 @@ export class UsersComponent implements OnInit {
             'Usuario creado exitosamente',
             `${response.data.nombre} ${response.data.apellido} ha sido registrado como firmante.`
           );
-          console.log('Firmante creado:', response.data);
           this.closeCreateModal();
           this.loadUsers();
         } else {

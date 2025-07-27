@@ -106,9 +106,7 @@ export class CertificatesComponent implements OnInit {
           this.totalPages = Math.ceil(activeCertificates.length / this.pageSize);
           this.currentPage = response.data.page || 0;
           this.applyFilters();
-          console.log('Certificates loaded:', activeCertificates);
         } else {
-          console.error('Error in API response:', response.message);
           this.certificates = [];
         }
         this.isLoading = false;
