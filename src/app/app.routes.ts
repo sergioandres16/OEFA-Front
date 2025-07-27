@@ -13,11 +13,7 @@ export const routes: Routes = [
     canActivate: [NoAuthGuard]
   },
   {
-    path: 'firmante/verify',
-    loadComponent: () => import('./features/auth/firmante-login/firmante-login.component').then(c => c.FirmanteLoginComponent)
-  },
-  {
-    path: 'firmante/verify/**',
+    path: 'firmante/verify/:token',
     loadComponent: () => import('./features/auth/firmante-login/firmante-login.component').then(c => c.FirmanteLoginComponent)
   },
   {
