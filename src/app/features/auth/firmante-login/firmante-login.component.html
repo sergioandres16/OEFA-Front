@@ -13,35 +13,16 @@
             <span class="logo-text">OEFA</span>
           </div>
         </div>
-        <h1 class="login-title">Acceso de Firmante</h1>
-        <p class="login-subtitle">Ingresa tu DNI y PIN para acceder</p>
+        <h1 class="login-title">Registrar PIN</h1>
+        <p class="login-subtitle">Ingresa tu nuevo PIN para activar tu cuenta</p>
       </div>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()" class="login-form">
         <div class="form-content">
-          <div class="form-group">
-            <label for="dni" class="form-label">
-              <i class="icon-user"></i>
-              DNI
-            </label>
-            <input
-              id="dni"
-              type="text"
-              formControlName="dni"
-              class="form-control"
-              [class.is-invalid]="isFieldInvalid('dni')"
-              placeholder="12345678"
-              maxlength="8"
-              autocomplete="username">
-            <span *ngIf="getFieldError('dni')" class="form-error">
-              {{ getFieldError('dni') }}
-            </span>
-          </div>
-
           <div class="form-group">
             <label for="pin" class="form-label">
               <i class="icon-key"></i>
-              PIN de Acceso
+              PIN de Acceso (6 dígitos)
             </label>
             <input
               id="pin"
@@ -51,7 +32,7 @@
               [class.is-invalid]="isFieldInvalid('pin')"
               placeholder="••••••"
               maxlength="6"
-              autocomplete="current-password">
+              autocomplete="new-password">
             <span *ngIf="getFieldError('pin')" class="form-error">
               {{ getFieldError('pin') }}
             </span>
@@ -66,42 +47,32 @@
             <button
               type="submit"
               class="btn btn-secondary btn-lg"
-              [disabled]="isLoading || loginForm.invalid">
+              [disabled]="isLoading || verifyForm.invalid || !activationToken">
               <span *ngIf="isLoading" class="loading"></span>
-              <span *ngIf="!isLoading">Iniciar Sesión</span>
+              <span *ngIf="!isLoading">Registrar PIN</span>
             </button>
           </div>
         </div>
       </form>
 
       <div class="login-footer">
-        <div class="demo-credentials">
-          <h3>Credenciales Demo:</h3>
-          <div class="demo-section">
-            <strong>DNI:</strong> <span>12345678</span><br>
-            <strong>PIN:</strong> <span>123456</span>
-          </div>
-        </div>
-        
-        <div class="help-section">
-          <h3>¿Necesitas ayuda?</h3>
-          <ul>
-            <li>Si olvidaste tu PIN, contacta al administrador</li>
-            <li>El PIN debe tener exactamente 6 dígitos</li>
-            <li>Después de 3 intentos fallidos, tu cuenta será bloqueada</li>
-          </ul>
-        </div>
-        
-        <div class="navigation-links">
-          <a routerLink="/admin/login" class="nav-link">
-            ¿Eres administrador? Accede aquí
-          </a>
-        </div>
-        
         <p class="copyright">
           © 2024 OEFA - Organismo de Evaluación y Fiscalización Ambiental
         </p>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div *ngIf="showSuccessModal" class="modal-overlay">
+  <div class="modal-content success-modal">
+    <div class="modal-header success-header">
+      <i class="icon-check-circle"></i>
+      <h2>¡PIN Registrado Exitosamente!</h2>
+    </div>
+    <div class="modal-body">
+      <p>{{ successMessage }}</p>
     </div>
   </div>
 </div>

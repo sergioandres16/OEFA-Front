@@ -65,6 +65,20 @@ export class AuthService {
       );
   }
 
+  activateFirmante(activationToken: string, pin: string): Observable<ApiResponse> {
+    this.isLoadingSubject.next(true);
+    
+    const request = { activationToken, pin };
+    return this.http.post<ApiResponse>(`${this.API_URL}/firmante/activate`, request)
+      .pipe(
+        tap(() => this.isLoadingSubject.next(false)),
+        catchError(error => {
+          this.isLoadingSubject.next(false);
+          throw error;
+        })
+      );
+  }
+
   refreshToken(): Observable<JwtResponse> {
     const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) {
@@ -161,13 +175,6 @@ export class AuthService {
       );
   }
 
-  activateFirmante(activationToken: string, pin: string): Observable<any> {
-    const request = { activationToken, pin };
-    return this.http.post(`${this.API_URL}/firmante/activate`, request)
-      .pipe(
-        catchError(error => this.handleError(error))
-      );
-  }
 
   private handleAuthSuccess(response: JwtResponse): void {
     // Store only essential auth data
