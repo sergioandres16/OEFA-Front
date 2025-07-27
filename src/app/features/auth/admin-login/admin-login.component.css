@@ -77,7 +77,9 @@
 }
 
 .logo-container {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+  text-align: center;
 }
 
 .logo {
@@ -115,10 +117,12 @@
 }
 
 .logo-image {
-  width: 100px;
-  height: 100px;
+  width: 300px;
+  height: auto;
+  max-height: 300px;
   object-fit: contain;
-  margin-bottom: 1rem;
+  margin: 0 auto;
+  display: block;
 }
 
 .login-title {

@@ -28,7 +28,8 @@
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  width: 100%;
 }
 
 .logo-icon {
@@ -49,10 +50,15 @@
 }
 
 .sidebar-logo-image {
-  width: 48px;
-  height: 48px;
+  width: 70px;
+  height: 70px;
   object-fit: contain;
-  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+.sidebar.expanded .sidebar-logo-image {
+  width: 120px;
+  height: 120px;
 }
 
 .logo-info h3 {
