@@ -102,3 +102,17 @@ export class NoAuthGuard implements CanActivate {
     return false;
   }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FirmanteNoAuthGuard implements CanActivate {
+  constructor(
+    private authService: AuthService
+  ) {}
+
+  canActivate(): Observable<boolean> | Promise<boolean> | boolean {
+    // Las rutas de firmante siempre son accesibles, sin redireccionar
+    return true;
+  }
+}

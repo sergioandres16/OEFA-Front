@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard, NoAuthGuard, AdminGuard } from './core/guards/auth.guard';
+import { AuthGuard, NoAuthGuard, AdminGuard, FirmanteNoAuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -13,8 +13,19 @@ export const routes: Routes = [
     canActivate: [NoAuthGuard]
   },
   {
+    path: 'firmante/verify',
+    loadComponent: () => import('./features/auth/firmante-login/firmante-login.component').then(c => c.FirmanteLoginComponent),
+    canActivate: [FirmanteNoAuthGuard]
+  },
+  {
     path: 'firmante/verify/:token',
-    loadComponent: () => import('./features/auth/firmante-login/firmante-login.component').then(c => c.FirmanteLoginComponent)
+    loadComponent: () => import('./features/auth/firmante-login/firmante-login.component').then(c => c.FirmanteLoginComponent),
+    canActivate: [FirmanteNoAuthGuard]
+  },
+  {
+    path: 'firmante/**',
+    loadComponent: () => import('./features/auth/firmante-login/firmante-login.component').then(c => c.FirmanteLoginComponent),
+    canActivate: [FirmanteNoAuthGuard]
   },
   {
     path: 'activate',
