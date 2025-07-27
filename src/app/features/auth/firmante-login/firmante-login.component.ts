@@ -33,8 +33,9 @@ export class FirmanteLoginComponent implements OnInit {
       this.isLoading = loading;
     });
 
-    // Obtener el token de activación de la URL
-    this.activationToken = this.route.snapshot.params['token'] || '';
+    // Obtener el token de activación completo de la URL (incluyendo caracteres especiales)
+    const url = this.route.snapshot.url.map(segment => segment.path).join('/');
+    this.activationToken = url.replace('firmante/verify/', '') || '';
     if (!this.activationToken) {
       this.error = 'Token de activación no válido';
     }

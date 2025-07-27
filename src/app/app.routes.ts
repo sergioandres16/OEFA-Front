@@ -13,9 +13,14 @@ export const routes: Routes = [
     canActivate: [NoAuthGuard]
   },
   {
-    path: 'firmante/verify/:token',
+    path: 'firmante/verify/**',
     loadComponent: () => import('./features/auth/firmante-login/firmante-login.component').then(c => c.FirmanteLoginComponent),
     canActivate: [NoAuthGuard]
+  },
+  {
+    path: 'firmante/**',
+    redirectTo: '/firmante/verify/',
+    pathMatch: 'prefix'
   },
   {
     path: 'activate',
