@@ -33,8 +33,7 @@ export class AdminLoginComponent implements OnInit {
   createForm(): FormGroup {
     return this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
