@@ -27,7 +27,7 @@ spec:
         - name: registry-credentials-fmovil
       containers:
       - name: frontend
-        image: harbor.oefa.gob.pe/fmovil/hectorvc2022/fmovil-frontend:v1.0.0
+        image: harbor.oefa.gob.pe/fmovil/hub.docker.com/hectorvc2022/fmovil-frontend:v1.0.0
         imagePullPolicy: Always
         ports:
         - containerPort: 9080
