@@ -118,19 +118,15 @@ export class SignedDocumentsComponent implements OnInit {
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       filtered = filtered.filter(doc => {
-        // Buscar información del firmante
-        const user = this.users.find(u => u.id === doc.userId);
-        const userName = user ? `${user.nombre} ${user.apellido}`.toLowerCase() : '';
-        const userEmail = user ? user.email.toLowerCase() : '';
+        // El nombre del firmante ya viene en la respuesta
+        const firmanteNombre = doc.firmanteNombre ? doc.firmanteNombre.toLowerCase() : '';
         
         return (
-          (doc.fileName && doc.fileName.toLowerCase().includes(searchTerm)) ||
-          (doc.dni && doc.dni.toLowerCase().includes(searchTerm)) ||
-          (doc.motivo && doc.motivo.toLowerCase().includes(searchTerm)) ||
+          (doc.originalFilename && doc.originalFilename.toLowerCase().includes(searchTerm)) ||
+          (doc.firmanteDni && doc.firmanteDni.toLowerCase().includes(searchTerm)) ||
+          (doc.firmanteNombre && doc.firmanteNombre.toLowerCase().includes(searchTerm)) ||
           (doc.cargoFirmante && doc.cargoFirmante.toLowerCase().includes(searchTerm)) ||
-          userName.includes(searchTerm) ||
-          userEmail.includes(searchTerm) ||
-          (doc.documentPath && doc.documentPath.toLowerCase().includes(searchTerm))
+          (doc.signatureType && doc.signatureType.toLowerCase().includes(searchTerm))
         );
       });
     }
@@ -171,21 +167,21 @@ export class SignedDocumentsComponent implements OnInit {
       let valueB: any;
       
       switch (this.sortBy) {
-        case 'fileName':
-          valueA = (a.fileName || '').toLowerCase();
-          valueB = (b.fileName || '').toLowerCase();
+        case 'originalFilename':
+          valueA = (a.originalFilename || '').toLowerCase();
+          valueB = (b.originalFilename || '').toLowerCase();
           break;
-        case 'userId':
-          valueA = this.getUserName(a.userId).toLowerCase();
-          valueB = this.getUserName(b.userId).toLowerCase();
+        case 'firmanteNombre':
+          valueA = (a.firmanteNombre || '').toLowerCase();
+          valueB = (b.firmanteNombre || '').toLowerCase();
           break;
-        case 'dni':
-          valueA = (a.dni || '').toLowerCase();
-          valueB = (b.dni || '').toLowerCase();
+        case 'firmanteDni':
+          valueA = (a.firmanteDni || '').toLowerCase();
+          valueB = (b.firmanteDni || '').toLowerCase();
           break;
-        case 'signatureDate':
-          valueA = new Date(a.signatureDate);
-          valueB = new Date(b.signatureDate);
+        case 'signedAt':
+          valueA = a.signedAt ? new Date(a.signedAt) : new Date(0);
+          valueB = b.signedAt ? new Date(b.signedAt) : new Date(0);
           break;
         case 'createdAt':
           valueA = new Date(a.createdAt);
@@ -195,9 +191,9 @@ export class SignedDocumentsComponent implements OnInit {
           valueA = a.status;
           valueB = b.status;
           break;
-        case 'documentSize':
-          valueA = a.documentSize;
-          valueB = b.documentSize;
+        case 'signatureType':
+          valueA = (a.signatureType || '').toLowerCase();
+          valueB = (b.signatureType || '').toLowerCase();
           break;
         default:
           return 0;
@@ -268,14 +264,8 @@ export class SignedDocumentsComponent implements OnInit {
     this.applyFilters();
   }
 
-  getUserName(userId: number): string {
-    const user = this.users.find(u => u.id === userId);
-    return user ? `${user.nombre} ${user.apellido}` : `Usuario ID: ${userId}`;
-  }
-
-  getUserEmail(userId: number): string {
-    const user = this.users.find(u => u.id === userId);
-    return user ? user.email : '';
+  getFirmanteNombre(document: SignedDocument): string {
+    return document.firmanteNombre || `Usuario ID: ${document.firmanteUserId}`;
   }
 
   getStatusDisplayName(status: string): string {

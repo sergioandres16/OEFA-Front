@@ -16,22 +16,20 @@ export interface PagedResponse<T> {
 
 export interface SignedDocument {
   id: number;
-  fileName: string;
-  documentType: string;
-  documentPath: string;
-  userId: number;
-  dni: string;
-  signerName?: string;
-  signerEmail?: string;
-  signatureDate: string;
-  status: string;
-  documentSize: number;
-  motivo?: string;
-  localidad?: string;
+  fileUuid: string;
+  originalFilename: string;
+  signedFilename?: string;
+  firmanteDni: string;
+  firmanteUserId: number;
+  firmanteNombre: string;
   cargoFirmante?: string;
-  isVisa: boolean;
+  signatureType: string;
+  status: string;
+  localUrl: string;
   createdAt: string;
-  updatedAt: string;
+  signedAt?: string;
+  idDocumentoProcesoFirma?: string;
+  idGrupoProcesoFirma?: string;
 }
 
 export interface SignedDocumentListParams {
