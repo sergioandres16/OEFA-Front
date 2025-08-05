@@ -5,9 +5,12 @@ docker login harbor.oefa.gob.pe
 
 # Definir nombres e imagenes
 IMAGES=(
-  auth-service
-  certificate-service
-  signature-service
+    eureka-server
+    gateway-service
+    auth-service
+    certificate-service
+    signature-service
+    notification-service
 )
 
 ORIGIN_USER=hectorvc2022
