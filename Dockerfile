@@ -41,7 +41,8 @@ RUN echo '#!/bin/sh' > /usr/local/bin/start-nginx.sh && \
     echo 'export BACKEND_PROXY_URL=${BACKEND_PROXY_URL:-"https://srvlb01.okd-dev.oefa.gob.pe"}' >> /usr/local/bin/start-nginx.sh && \
     echo 'echo "BACKEND_PROXY_URL: $BACKEND_PROXY_URL"' >> /usr/local/bin/start-nginx.sh && \
     echo 'envsubst "\$BACKEND_PROXY_URL" < /etc/nginx/nginx.conf.template > /tmp/nginx.conf' >> /usr/local/bin/start-nginx.sh && \
-    echo 'cp /tmp/nginx.conf /etc/nginx/nginx.conf' >> /usr/local/bin/start-nginx.sh && \
+    echo 'rm /etc/nginx/nginx.conf' >> /usr/local/bin/start-nginx.sh && \
+    echo 'mv /tmp/nginx.conf /etc/nginx/nginx.conf' >> /usr/local/bin/start-nginx.sh && \
     echo 'echo "Starting nginx..."' >> /usr/local/bin/start-nginx.sh && \
     echo 'exec nginx -g "daemon off;"' >> /usr/local/bin/start-nginx.sh && \
     chmod +x /usr/local/bin/start-nginx.sh
