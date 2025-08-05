@@ -1,7 +1,7 @@
 <nav class="sidebar" [class.expanded]="isSidebarExpanded">
   <div class="sidebar-header">
     <div class="sidebar-logo">
-      <img src="/OEFA-sidebar.png" alt="OEFA Logo" class="sidebar-logo-image">
+      <img src="OEFA-sidebar.png" alt="OEFA Logo" class="sidebar-logo-image">
     </div>
   </div>
 
@@ -20,9 +20,9 @@
     <div class="sidebar-menu">
       <ul class="menu-list">
         <li class="menu-item" *ngFor="let item of getVisibleMenuItems()">
-          <a 
-            [routerLink]="item.route" 
-            routerLinkActive="active" 
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
             class="menu-link">
             <i class="menu-icon icon-{{ item.icon }}"></i>
             <span class="menu-text" *ngIf="isSidebarExpanded">{{ item.title }}</span>
