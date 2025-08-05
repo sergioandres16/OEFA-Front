@@ -19,13 +19,14 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 
 # Crear directorio de config temporal (con permisos para user 1001)
-RUN mkdir -p /tmp/nginx && \
+RUN mkdir -p /tmp/nginx /var/run/nginx && \
     chgrp -R 0 /usr/share/nginx/html /var/cache/nginx /var/log/nginx /var/run/nginx /tmp/nginx && \
     chmod -R g=u /usr/share/nginx/html /var/cache/nginx /var/log/nginx /var/run/nginx /tmp/nginx && \
     chmod -R 775 /usr/share/nginx/html /tmp/nginx && \
     touch /var/run/nginx/nginx.pid && \
     chmod 664 /var/run/nginx/nginx.pid && \
     chmod g+rwx /var/run/nginx
+
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:9080/health || exit 1
