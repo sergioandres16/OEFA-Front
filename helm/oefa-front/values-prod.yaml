@@ -1,0 +1,58 @@
+# Production environment values for fmovil-frontend
+# Override default values here for production environment
+
+# Frontend configuration for production
+frontend:
+  image: harbor.oefa.gob.pe/fmovil/hectorvc2022/fmovil-frontend:v1.0.0
+  replicas: 3
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 200m
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+
+# Production environment URLs
+environment:
+  apiBaseUrl: "https://gateway-route-fmovil.apps.okd-prod.oefa.gob.pe"
+  frontendBaseUrl: "https://oefa-front.apps.okd-prod.oefa.gob.pe"
+  profiles: produccion
+
+# Production route
+route:
+  host: "oefa-front.apps.okd-prod.oefa.gob.pe"
+  annotations:
+    haproxy.router.openshift.io/timeout: "120s"
+    haproxy.router.openshift.io/rate-limit-connections: "true"
+    haproxy.router.openshift.io/rate-limit-connections.concurrent-tcp: "200"
+    haproxy.router.openshift.io/rate-limit-connections.rate-http: "2000"
+    haproxy.router.openshift.io/rate-limit-connections.rate-tcp: "2000"
+
+# Production-specific annotations
+podAnnotations:
+  environment: "production"
+
+# Enhanced health checks for production
+healthCheck:
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Monitoring enabled for production
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+# Network policy for production security
+networkPolicy:
+  enabled: true

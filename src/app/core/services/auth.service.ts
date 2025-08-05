@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap, catchError, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { User, JwtResponse, LoginRequest, ApiResponse, UserRole } from '../models/user.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe/auth/api/v1';
+  private readonly API_URL = `${environment.apiBaseUrl}/auth/api/v1`;
   
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);

@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: fmovil-microservices
+    component: frontend
+spec:
+  replicas: {{ .Values.services.frontend.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: fmovil-microservices
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: fmovil-microservices
+        component: frontend
+    spec:
+      securityContext:
+        fsGroup: {{ .Values.security.fsGroup }}
+      containers:
+        - name: frontend
+          image: {{ .Values.services.frontend.image }}
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: {{ .Values.services.frontend.port }}
+              protocol: TCP
+          env:
+            - name: API_BASE_URL
+              value: {{ .Values.services.frontend.apiBaseUrl | quote }}
+            - name: FRONTEND_BASE_URL
+              value: {{ .Values.services.frontend.frontendBaseUrl | quote }}
+            - name: APP_NAME
+              value: "OEFA - Sistema de Firmas Digitales"
+            - name: APP_VERSION
+              value: "v1.0.0"
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.services.frontend.healthCheck.path }}
+              port: {{ .Values.services.frontend.port }}
+            {{- toYaml .Values.services.frontend.healthCheck.livenessProbe | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.services.frontend.healthCheck.path }}
+              port: {{ .Values.services.frontend.port }}
+            {{- toYaml .Values.services.frontend.healthCheck.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.services.frontend.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: {{ .Values.security.runAsNonRoot }}
+            runAsUser: {{ .Values.security.runAsUser }}
+            capabilities:
+              drop:
+                - ALL
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

@@ -2,17 +2,18 @@
 
 ## Descripción General
 
-OEFA Front es una plataforma web desarrollada en Angular 20 para la gestión de certificados digitales y firmas electrónicas del Organismo de Evaluación y Fiscalización Ambiental (OEFA). La plataforma permite a los administradores gestionar firmantes y certificados, mientras que los firmantes pueden activar sus cuentas y realizar operaciones de firma digital.
+OEFA Front es una plataforma web desarrollada en Angular 20.1.0 para la gestión de certificados digitales y firmas electrónicas del Organismo de Evaluación y Fiscalización Ambiental (OEFA). La plataforma permite a los administradores gestionar firmantes y certificados, mientras que los firmantes pueden activar sus cuentas y realizar operaciones de firma digital.
 
 ## Arquitectura del Sistema
 
 ### Tecnologías Utilizadas
-- **Frontend**: Angular 20 con componentes standalone
+- **Frontend**: Angular 20.1.0 con componentes standalone
 - **Lenguaje**: TypeScript 5.8.2
 - **Estilos**: CSS personalizado
 - **HTTP Client**: Angular HttpClient para comunicación con APIs
 - **Autenticación**: JWT (JSON Web Tokens)
-- **Testing**: Jasmine y Karma
+- **Testing**: Jasmine 5.8.0 y Karma 6.4.0
+- **Build System**: Angular Build 20.1.0
 
 ### Estructura del Proyecto
 ```
@@ -197,8 +198,8 @@ src/
 
 ### Prerrequisitos
 - Node.js (versión 18+)
-- Angular CLI 20+
-- NPM o Yarn
+- Angular CLI 20.1.0+
+- NPM (recomendado)
 
 ### Instalación
 ```bash
@@ -206,7 +207,7 @@ src/
 git clone [repository-url]
 
 # Navegar al directorio
-cd OEFAFront
+cd OEFA-Front
 
 # Instalar dependencias
 npm install
@@ -216,10 +217,10 @@ npm start
 ```
 
 ### Scripts Disponibles
-- `npm start` - Servidor de desarrollo (puerto 4200)
-- `npm run build` - Build de producción
-- `npm run watch` - Build con watch mode
-- `npm test` - Ejecutar tests unitarios
+- `npm start` / `ng serve` - Servidor de desarrollo (puerto 4200)
+- `npm run build` / `ng build` - Build de producción
+- `npm run watch` / `ng build --watch --configuration development` - Build con watch mode
+- `npm test` / `ng test` - Ejecutar tests unitarios con Karma
 
 ### Configuración de Ambiente
 Las URLs de los servicios backend están configuradas directamente en los servicios. Para diferentes ambientes, actualizar las constantes `API_URL` in:
@@ -271,5 +272,6 @@ Para soporte técnico o consultas sobre el sistema, contactar al equipo de desar
 ---
 
 **Versión**: 0.0.0  
-**Última actualización**: 2025  
-**Desarrollado para**: Organismo de Evaluación y Fiscalización Ambiental (OEFA)
+**Última actualización**: Agosto 2025  
+**Desarrollado para**: Organismo de Evaluación y Fiscalización Ambiental (OEFA)  
+**Nombre del proyecto**: oefafront

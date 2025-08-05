@@ -1,0 +1,42 @@
+# Frontend service configuration (to be integrated in fmovil-microservices values.yaml)
+# Add this section to the main chart values.yaml under 'services:'
+
+  frontend:
+    image: harbor.oefa.gob.pe/fmovil/hectorvc2022/fmovil-frontend:v1.0.0
+    port: 8080
+    replicas: 2
+    expose: true
+    tls: true
+    logLevel: INFO
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
+    # Environment URLs
+    apiBaseUrl: "https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe"
+    frontendBaseUrl: "https://oefa-front.apps.okd-dev.oefa.gob.pe"
+    # Health check configuration
+    healthCheck:
+      path: /health
+      livenessProbe:
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+      readinessProbe:
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 3
+        failureThreshold: 3
+    # Route configuration
+    route:
+      host: "oefa-front.apps.okd-dev.oefa.gob.pe"
+      annotations:
+        haproxy.router.openshift.io/timeout: "60s"
+        haproxy.router.openshift.io/rate-limit-connections: "true"
+        haproxy.router.openshift.io/rate-limit-connections.concurrent-tcp: "100"
+        haproxy.router.openshift.io/rate-limit-connections.rate-http: "1000"
+        haproxy.router.openshift.io/rate-limit-connections.rate-tcp: "1000"

@@ -1,0 +1,30 @@
+{{- if and .Values.services.frontend.expose .Values.openshift.createRoute }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: frontend-route
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: fmovil-microservices
+    component: frontend
+  {{- with .Values.services.frontend.route.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  host: {{ .Values.services.frontend.route.host }}
+  to:
+    kind: Service
+    name: frontend-service
+    weight: 100
+  port:
+    targetPort: http
+  {{- if .Values.services.frontend.tls }}
+  tls:
+    termination: {{ .Values.openshift.routeTLS }}
+    {{- if .Values.openshift.insecureEdgeTerminationPolicy }}
+    insecureEdgeTerminationPolicy: {{ .Values.openshift.insecureEdgeTerminationPolicy }}
+    {{- end }}
+  {{- end }}
+  wildcardPolicy: None
+{{- end }}

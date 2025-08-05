@@ -1,0 +1,34 @@
+# Development environment values for fmovil-frontend
+# Override default values here for development environment
+
+# Frontend configuration for development
+frontend:
+  image: harbor.oefa.gob.pe/fmovil/hectorvc2022/fmovil-frontend:v1.0.0-dev
+  replicas: 1
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 256Mi
+      cpu: 300m
+
+# Development environment URLs
+environment:
+  apiBaseUrl: "https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe"
+  frontendBaseUrl: "https://oefa-front-dev.apps.okd-dev.oefa.gob.pe"
+  profiles: desarrollo
+
+# Development route
+route:
+  host: "oefa-front-dev.apps.okd-dev.oefa.gob.pe"
+
+# Development-specific annotations
+podAnnotations:
+  environment: "development"
+  
+# Service monitor for development monitoring
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true

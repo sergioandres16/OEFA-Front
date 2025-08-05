@@ -1,0 +1,29 @@
+apiVersion: v2
+name: fmovil-frontend
+description: A Helm chart for OEFA FMovil Frontend - Sistema de Firmas Digitales Angular application (integrated with microservices)
+type: application
+version: 1.0.0
+appVersion: "v1.0.0"
+
+keywords:
+  - angular
+  - frontend
+  - oefa
+  - fmovil
+  - firma-digital
+  - microservices
+
+home: https://oefa-front.apps.okd-dev.oefa.gob.pe
+sources:
+  - https://github.com/oefa/fmovil-frontend
+
+maintainers:
+  - name: OEFA Development Team
+    email: dev@oefa.gob.pe
+  - name: Hector VC
+    email: hectorvc2022@oefa.gob.pe
+
+annotations:
+  category: Frontend
+  licenses: MIT
+  integration: fmovil-microservices
