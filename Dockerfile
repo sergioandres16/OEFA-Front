@@ -43,13 +43,16 @@ RUN echo '#!/bin/sh' > /docker-entrypoint.d/env.sh && \
     echo '    exit 0' >> /docker-entrypoint.d/env.sh && \
     echo 'fi' >> /docker-entrypoint.d/env.sh && \
     echo 'echo "Found main JS file: $MAIN_JS_FILE"' >> /docker-entrypoint.d/env.sh && \
-    echo 'API_BASE_URL=${API_BASE_URL:-"https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe"}' >> /docker-entrypoint.d/env.sh && \
+    echo 'API_BASE_URL=${API_BASE_URL:-"/fmovil"}' >> /docker-entrypoint.d/env.sh && \
     echo 'FRONTEND_BASE_URL=${FRONTEND_BASE_URL:-"https://oefa-front.apps.okd-dev.oefa.gob.pe"}' >> /docker-entrypoint.d/env.sh && \
+    echo 'BACKEND_PROXY_URL=${BACKEND_PROXY_URL:-"https://srvlb01.okd-dev.oefa.gob.pe"}' >> /docker-entrypoint.d/env.sh && \
     echo 'echo "API_BASE_URL: $API_BASE_URL"' >> /docker-entrypoint.d/env.sh && \
     echo 'echo "FRONTEND_BASE_URL: $FRONTEND_BASE_URL"' >> /docker-entrypoint.d/env.sh && \
+    echo 'echo "BACKEND_PROXY_URL: $BACKEND_PROXY_URL"' >> /docker-entrypoint.d/env.sh && \
     echo 'cp "$MAIN_JS_FILE" "$MAIN_JS_FILE.tmp"' >> /docker-entrypoint.d/env.sh && \
     echo 'sed "s|__API_BASE_URL__|$API_BASE_URL|g; s|__FRONTEND_BASE_URL__|$FRONTEND_BASE_URL|g" "$MAIN_JS_FILE.tmp" > "$MAIN_JS_FILE"' >> /docker-entrypoint.d/env.sh && \
     echo 'rm -f "$MAIN_JS_FILE.tmp"' >> /docker-entrypoint.d/env.sh && \
+    echo 'sed -i "s|__BACKEND_PROXY_URL__|$BACKEND_PROXY_URL|g" /etc/nginx/nginx.conf' >> /docker-entrypoint.d/env.sh && \
     echo 'echo "Environment variables injected successfully"' >> /docker-entrypoint.d/env.sh && \
     chmod +x /docker-entrypoint.d/env.sh
 

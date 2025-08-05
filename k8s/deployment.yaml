@@ -35,9 +35,11 @@ spec:
           protocol: TCP
         env:
         - name: API_BASE_URL
-          value: "https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe"
+          value: "/fmovil"
         - name: FRONTEND_BASE_URL
           value: "https://oefa-front.apps.okd-dev.oefa.gob.pe"
+        - name: BACKEND_PROXY_URL
+          value: "https://srvlb01.okd-dev.oefa.gob.pe"
         - name: APP_NAME
           value: "OEFA - Sistema de Firmas Digitales"
         - name: APP_VERSION
