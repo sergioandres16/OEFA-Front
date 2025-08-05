@@ -31,8 +31,8 @@ RUN mkdir -p /var/cache/nginx/client_temp /var/cache/nginx/proxy_temp /var/cache
     chmod -R 777 /var/cache/nginx /var/log/nginx /var/run/nginx /usr/share/nginx/html && \
     chmod -R 755 /etc/nginx
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy custom nginx configuration as template
+COPY nginx.conf /etc/nginx/nginx.conf.template
 
 # Create environment script that works with read-only filesystem
 RUN echo '#!/bin/sh' > /docker-entrypoint.d/env.sh && \
@@ -52,7 +52,7 @@ RUN echo '#!/bin/sh' > /docker-entrypoint.d/env.sh && \
     echo 'cp "$MAIN_JS_FILE" "$MAIN_JS_FILE.tmp"' >> /docker-entrypoint.d/env.sh && \
     echo 'sed "s|__API_BASE_URL__|$API_BASE_URL|g; s|__FRONTEND_BASE_URL__|$FRONTEND_BASE_URL|g" "$MAIN_JS_FILE.tmp" > "$MAIN_JS_FILE"' >> /docker-entrypoint.d/env.sh && \
     echo 'rm -f "$MAIN_JS_FILE.tmp"' >> /docker-entrypoint.d/env.sh && \
-    echo 'sed -i "s|__BACKEND_PROXY_URL__|$BACKEND_PROXY_URL|g" /etc/nginx/nginx.conf' >> /docker-entrypoint.d/env.sh && \
+    echo 'sed "s|__BACKEND_PROXY_URL__|$BACKEND_PROXY_URL|g" /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf' >> /docker-entrypoint.d/env.sh && \
     echo 'echo "Environment variables injected successfully"' >> /docker-entrypoint.d/env.sh && \
     chmod +x /docker-entrypoint.d/env.sh
 
