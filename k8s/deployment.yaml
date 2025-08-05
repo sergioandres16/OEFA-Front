@@ -26,52 +26,58 @@ spec:
       imagePullSecrets:
         - name: registry-credentials-fmovil
       containers:
-      - name: frontend
-        image: harbor.oefa.gob.pe/fmovil/hub.docker.com/hectorvc2022/fmovil-frontend:v1.0.0
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 9080
-          name: http
-          protocol: TCP
-        env:
-        - name: API_BASE_URL
-          value: "/fmovil"
-        - name: FRONTEND_BASE_URL
-          value: "https://oefa-front.apps.okd-dev.oefa.gob.pe"
-        - name: BACKEND_PROXY_URL
-          value: "https://srvlb01.okd-dev.oefa.gob.pe"
-        - name: APP_NAME
-          value: "OEFA - Sistema de Firmas Digitales"
-        - name: APP_VERSION
-          value: "v1.0.0"
-        resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 9080
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 9080
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        securityContext:
-          allowPrivilegeEscalation: false
-          runAsNonRoot: true
-          capabilities:
-            drop:
-            - ALL
+        - name: frontend
+          image: harbor.oefa.gob.pe/fmovil/hub.docker.com/hectorvc2022/fmovil-frontend:v1.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9080
+              name: http
+              protocol: TCP
+          env:
+            - name: API_BASE_URL
+              value: "/fmovil"
+            - name: FRONTEND_BASE_URL
+              value: "https://oefa-front.apps.okd-dev.oefa.gob.pe"
+            - name: BACKEND_PROXY_URL
+              value: "https://srvlb01.okd-dev.oefa.gob.pe"
+            - name: APP_NAME
+              value: "OEFA - Sistema de Firmas Digitales"
+            - name: APP_VERSION
+              value: "v1.0.0"
+            # Variables adicionales para debugging
+            - name: NGINX_DEBUG
+              value: "false"
+            - name: TZ
+              value: "America/Lima"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
