@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build -- --configuration=production --output-path=/app/dist
+RUN npm run build -- --configuration=production --output-path=/app/dist --base-href=/fmovil/frontend/
 # Stage 2: Nginx with OpenShift optimizations
 FROM nginx:1.25-alpine
 # Remove default configs
