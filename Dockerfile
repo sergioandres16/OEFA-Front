@@ -37,7 +37,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Create environment script that works with read-only filesystem
 RUN echo '#!/bin/sh' > /docker-entrypoint.d/env.sh && \
     echo 'echo "Injecting environment variables..."' >> /docker-entrypoint.d/env.sh && \
-    echo 'MAIN_JS_FILE=$(find /usr/share/nginx/html -name "main*.js" | head -1)' >> /docker-entrypoint.d/env.sh && \
+    echo 'MAIN_JS_FILE=$(find /usr/share/nginx/html/browser -name "main*.js" | head -1)' >> /docker-entrypoint.d/env.sh && \
     echo 'if [ -z "$MAIN_JS_FILE" ]; then' >> /docker-entrypoint.d/env.sh && \
     echo '    echo "Warning: main*.js file not found"' >> /docker-entrypoint.d/env.sh && \
     echo '    exit 0' >> /docker-entrypoint.d/env.sh && \
