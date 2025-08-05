@@ -19,10 +19,8 @@ RUN npm run build -- --configuration=production
 # Production stage with nginx
 FROM nginx:alpine
 
-# Create nginx user and directories
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S -D -H -u 1001 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx && \
-    mkdir -p /var/cache/nginx /var/log/nginx /var/run/nginx && \
+# Setup directories and permissions for non-root nginx
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run/nginx && \
     chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run/nginx /usr/share/nginx/html && \
     chmod -R 755 /var/cache/nginx /var/log/nginx /var/run/nginx /usr/share/nginx/html
 
