@@ -33,10 +33,6 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'demo',
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(c => c.DashboardComponent)
-  },
-  {
     path: 'certificates',
     loadComponent: () => import('./features/certificates/certificates.component').then(c => c.CertificatesComponent),
     canActivate: [AdminGuard]

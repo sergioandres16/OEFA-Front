@@ -70,15 +70,12 @@ export class DashboardComponent implements OnInit {
       this.error = null;
 
       const headers = this.getAuthHeaders();
-
-      // Cargar estadísticas en paralelo
       const [firmanteStats, certificateStats, documentStats] = await Promise.all([
         this.http.get<any>(`${this.API_URL}/auth/api/v1/admin/gestion/firmantes-stats`, { headers }).toPromise(),
         this.http.get<any>(`${this.API_URL}/certificates/api/v1/stats`, { headers }).toPromise(),
         this.http.get<any>(`${this.API_URL}/signatures/api/v1/admin/stats`, { headers }).toPromise()
       ]);
-
-      // Asignar datos o valores por defecto
+      
       this.stats = {
         firmantes: firmanteStats?.data || { totalFirmantes: 0, activeFirmantes: 0, pendingFirmantes: 0 },
         certificates: certificateStats?.data || { totalCertificates: 0, validCertificates: 0, invalidCertificates: 0 },
@@ -89,11 +86,11 @@ export class DashboardComponent implements OnInit {
       console.error('Error loading dashboard stats:', error);
       this.error = 'Error al cargar las estadísticas';
       
-      // Datos de respaldo para demo
+      // Fallback to default values on error
       this.stats = {
-        firmantes: { totalFirmantes: 25, activeFirmantes: 20, pendingFirmantes: 5 },
-        certificates: { totalCertificates: 45, validCertificates: 40, invalidCertificates: 5 },
-        documents: { totalDocuments: 120, signedDocuments: 85, visadoDocuments: 35, completedDocuments: 115, pendingDocuments: 5 }
+        firmantes: { totalFirmantes: 0, activeFirmantes: 0, pendingFirmantes: 0 },
+        certificates: { totalCertificates: 0, validCertificates: 0, invalidCertificates: 0 },
+        documents: { totalDocuments: 0, signedDocuments: 0, visadoDocuments: 0, completedDocuments: 0, pendingDocuments: 0 }
       };
     } finally {
       this.isLoading = false;
