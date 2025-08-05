@@ -9,7 +9,7 @@ IMAGE_NAME="fmovil-frontend"
 # Parse arguments
 TAG=${1:-$DEFAULT_TAG}
 REGISTRY=${2:-$DEFAULT_REGISTRY}
-DEBUG_MODE=${3:-""}
+DEBUG_MODE=${3:-"--debug"}
 FULL_IMAGE_NAME="${REGISTRY}/${IMAGE_NAME}:${TAG}"
 echo "=============================================="
 echo "Building Docker image for OEFA Front (Sin volúmenes)"
