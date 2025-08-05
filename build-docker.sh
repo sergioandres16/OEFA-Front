@@ -23,18 +23,10 @@ if ! docker info &> /dev/null; then
     echo "❌ Error: Docker is not running or not accessible"
     exit 1
 fi
-# Verificar que existen los archivos necesarios
-if [ ! -f "nginx-sin-volumenes.conf" ]; then
-    echo "❌ Error: nginx-sin-volumenes.conf not found"
-    exit 1
-fi
-if [ ! -f "Dockerfile-sin-volumenes" ]; then
-    echo "❌ Error: Dockerfile-sin-volumenes not found"
-    exit 1
-fi
+
 # Build the Docker image
 echo "🔨 Building Docker image (sin volúmenes)..."
-docker build -f "Dockerfile-sin-volumenes" -t "${FULL_IMAGE_NAME}" .
+docker build -t "${FULL_IMAGE_NAME}" .
 if [ $? -eq 0 ]; then
     echo "✅ Docker image built successfully: ${FULL_IMAGE_NAME}"
     # Show image size
