@@ -23,7 +23,7 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built application from build stage
-COPY --from=build /app/dist/oefafront/browser /usr/share/nginx/html
+COPY --from=build /app/dist/OEFAFront /usr/share/nginx/html
 
 # Copy environment script
 COPY env.sh /docker-entrypoint.d/env.sh
