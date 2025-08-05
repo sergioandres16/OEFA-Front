@@ -165,6 +165,8 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+  font-style: normal;
+  font-weight: normal;
 }
 
 .menu-text {
@@ -197,22 +199,22 @@
 }
 
 /* Icon placeholders */
-.icon-menu::before { content: '☰'; }
-.icon-dashboard::before { content: '📊'; }
-.icon-certificate::before { content: '📜'; }
-.icon-users::before { content: '👥'; }
-.icon-security::before { content: '🔒'; }
-.icon-audit::before { content: '📋'; }
-.icon-bell::before { content: '🔔'; }
-.icon-settings::before { content: '⚙️'; }
-.icon-logout::before { content: '🚪'; }
-.icon-clock::before { content: '⏰'; }
-.icon-shield::before { content: '🛡️'; }
-.icon-upload::before { content: '📤'; }
-.icon-user-add::before { content: '👤+'; }
-.icon-warning::before { content: '⚠️'; }
-.icon-home::before { content: '🏠'; }
-.icon-document::before { content: '📄'; }
+.icon-menu::before { content: '☰'; font-style: normal; }
+.icon-dashboard::before { content: '📊'; font-style: normal; }
+.icon-certificate::before { content: '📜'; font-style: normal; }
+.icon-users::before { content: '👥'; font-style: normal; }
+.icon-security::before { content: '🔒'; font-style: normal; }
+.icon-audit::before { content: '📋'; font-style: normal; }
+.icon-bell::before { content: '🔔'; font-style: normal; }
+.icon-settings::before { content: '⚙️'; font-style: normal; }
+.icon-logout::before { content: '🚪'; font-style: normal; }
+.icon-clock::before { content: '⏰'; font-style: normal; }
+.icon-shield::before { content: '🛡️'; font-style: normal; }
+.icon-upload::before { content: '📤'; font-style: normal; }
+.icon-user-add::before { content: '👤+'; font-style: normal; }
+.icon-warning::before { content: '⚠️'; font-style: normal; }
+.icon-home::before { content: '🏠'; font-style: normal; }
+.icon-document::before { content: '📄'; font-style: normal; }
 
 /* Responsive Design */
 @media (max-width: 768px) {
