@@ -27,4 +27,4 @@ HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost:9080/health
 EXPOSE 9080
 # Run as non-root user (OpenShift compatible)
 USER 1001
-CMD ["/bin/sh", "-c", "envsubst '${BACKEND_PROXY_URL}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "envsubst '${BACKEND_PROXY_URL}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && envsubst '${APP_NAME}' < /usr/share/nginx/html/browser/index.html > /tmp/index.html && mv /tmp/index.html /usr/share/nginx/html/browser/index.html && exec nginx -g 'daemon off;'"]
