@@ -92,13 +92,15 @@ export class SignedDocumentsComponent implements OnInit {
     // Cargar documentos firmados y visados
     this.signedDocumentsService.getAllSignedDocuments(params).subscribe({
       next: (response) => {
-        if (response.success && response.data) {
-          this.documents = response.data.content || [];
-          this.totalElements = response.data.totalElements || 0;
-          this.totalPages = response.data.totalPages || 0;
-          this.currentPage = response.data.number || 0;
-          this.applyFilters();
-        }
+        console.log('API Response:', response);
+        console.log('Documents received:', response.content);
+        this.documents = response.content || [];
+        this.totalElements = response.totalElements || 0;
+        this.totalPages = response.totalPages || 0;
+        this.currentPage = response.page || 0;
+        console.log('Documents array after assignment:', this.documents);
+        this.applyFilters();
+        console.log('Filtered documents after applyFilters:', this.filteredDocuments);
         this.isLoading = false;
       },
       error: (error) => {

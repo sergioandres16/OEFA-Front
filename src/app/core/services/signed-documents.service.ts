@@ -6,12 +6,14 @@ import { environment } from '../../../environments/environment';
 
 export interface PagedResponse<T> {
   content: T[];
-  number: number;
+  page: number;
   size: number;
   totalElements: number;
   totalPages: number;
   first: boolean;
   last: boolean;
+  hasPrevious: boolean;
+  hasNext: boolean;
 }
 
 export interface SignedDocument {
@@ -58,7 +60,7 @@ export class SignedDocumentsService {
   /**
    * Listar Documentos Firmados (Admin) - GET /admin/signed
    */
-  getAllSignedDocuments(params?: SignedDocumentListParams): Observable<ApiResponse<PagedResponse<SignedDocument>>> {
+  getAllSignedDocuments(params?: SignedDocumentListParams): Observable<PagedResponse<SignedDocument>> {
     let httpParams = new HttpParams();
 
     if (params?.search) httpParams = httpParams.set('search', params.search);
@@ -66,7 +68,7 @@ export class SignedDocumentsService {
     if (params?.size !== undefined) httpParams = httpParams.set('size', params.size.toString());
     if (params?.sortDirection) httpParams = httpParams.set('sortDirection', params.sortDirection);
 
-    return this.http.get<ApiResponse<PagedResponse<SignedDocument>>>(`${this.API_URL}/admin/signed`, { params: httpParams });
+    return this.http.get<PagedResponse<SignedDocument>>(`${this.API_URL}/admin/signed`, { params: httpParams });
   }
 
   /**
