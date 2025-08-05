@@ -34,30 +34,20 @@ RUN mkdir -p /var/cache/nginx/client_temp /var/cache/nginx/proxy_temp /var/cache
 # Copy custom nginx configuration as template
 COPY nginx.conf /etc/nginx/nginx.conf.template
 
-# Create environment script that works with read-only filesystem
-RUN echo '#!/bin/sh' > /docker-entrypoint.d/env.sh && \
-    echo 'echo "Injecting environment variables..."' >> /docker-entrypoint.d/env.sh && \
-    echo 'MAIN_JS_FILE=$(find /usr/share/nginx/html/browser -name "main*.js" | head -1)' >> /docker-entrypoint.d/env.sh && \
-    echo 'if [ -z "$MAIN_JS_FILE" ]; then' >> /docker-entrypoint.d/env.sh && \
-    echo '    echo "Warning: main*.js file not found"' >> /docker-entrypoint.d/env.sh && \
-    echo '    exit 0' >> /docker-entrypoint.d/env.sh && \
-    echo 'fi' >> /docker-entrypoint.d/env.sh && \
-    echo 'echo "Found main JS file: $MAIN_JS_FILE"' >> /docker-entrypoint.d/env.sh && \
-    echo 'API_BASE_URL=${API_BASE_URL:-"/fmovil"}' >> /docker-entrypoint.d/env.sh && \
-    echo 'FRONTEND_BASE_URL=${FRONTEND_BASE_URL:-"https://oefa-front.apps.okd-dev.oefa.gob.pe"}' >> /docker-entrypoint.d/env.sh && \
-    echo 'BACKEND_PROXY_URL=${BACKEND_PROXY_URL:-"https://srvlb01.okd-dev.oefa.gob.pe"}' >> /docker-entrypoint.d/env.sh && \
-    echo 'echo "API_BASE_URL: $API_BASE_URL"' >> /docker-entrypoint.d/env.sh && \
-    echo 'echo "FRONTEND_BASE_URL: $FRONTEND_BASE_URL"' >> /docker-entrypoint.d/env.sh && \
-    echo 'echo "BACKEND_PROXY_URL: $BACKEND_PROXY_URL"' >> /docker-entrypoint.d/env.sh && \
-    echo 'cp "$MAIN_JS_FILE" "$MAIN_JS_FILE.tmp"' >> /docker-entrypoint.d/env.sh && \
-    echo 'sed "s|__API_BASE_URL__|$API_BASE_URL|g; s|__FRONTEND_BASE_URL__|$FRONTEND_BASE_URL|g" "$MAIN_JS_FILE.tmp" > "$MAIN_JS_FILE"' >> /docker-entrypoint.d/env.sh && \
-    echo 'rm -f "$MAIN_JS_FILE.tmp"' >> /docker-entrypoint.d/env.sh && \
-    echo 'sed "s|__BACKEND_PROXY_URL__|$BACKEND_PROXY_URL|g" /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf' >> /docker-entrypoint.d/env.sh && \
-    echo 'echo "Environment variables injected successfully"' >> /docker-entrypoint.d/env.sh && \
-    chmod +x /docker-entrypoint.d/env.sh
+# Create startup script for environment variable substitution
+RUN echo '#!/bin/sh' > /usr/local/bin/start-nginx.sh && \
+    echo 'set -e' >> /usr/local/bin/start-nginx.sh && \
+    echo 'echo "Substituting environment variables in nginx config..."' >> /usr/local/bin/start-nginx.sh && \
+    echo 'export BACKEND_PROXY_URL=${BACKEND_PROXY_URL:-"https://srvlb01.okd-dev.oefa.gob.pe"}' >> /usr/local/bin/start-nginx.sh && \
+    echo 'echo "BACKEND_PROXY_URL: $BACKEND_PROXY_URL"' >> /usr/local/bin/start-nginx.sh && \
+    echo 'envsubst "\$BACKEND_PROXY_URL" < /etc/nginx/nginx.conf.template > /tmp/nginx.conf' >> /usr/local/bin/start-nginx.sh && \
+    echo 'cp /tmp/nginx.conf /etc/nginx/nginx.conf' >> /usr/local/bin/start-nginx.sh && \
+    echo 'echo "Starting nginx..."' >> /usr/local/bin/start-nginx.sh && \
+    echo 'exec nginx -g "daemon off;"' >> /usr/local/bin/start-nginx.sh && \
+    chmod +x /usr/local/bin/start-nginx.sh
 
 # Expose port 9080
 EXPOSE 9080
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start nginx with environment variable substitution
+CMD ["/usr/local/bin/start-nginx.sh"]
