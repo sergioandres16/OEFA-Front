@@ -18,7 +18,7 @@ RUN npm run build -- --configuration=production
 
 # Production stage with nginx
 FROM nginx:alpine
-
+USER root
 # Remove default nginx config and html
 RUN rm -rf /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*
 
