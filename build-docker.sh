@@ -4,7 +4,7 @@
 set -e
 # Default values
 DEFAULT_TAG="v1.0.0"
-DEFAULT_REGISTRY="harbor.oefa.gob.pe/fmovil/hub.docker.com/hectorvc2022"
+DEFAULT_REGISTRY="harbor.oefa.gob.pe/fmovil"
 IMAGE_NAME="fmovil-frontend"
 # Parse arguments
 TAG=${1:-$DEFAULT_TAG}

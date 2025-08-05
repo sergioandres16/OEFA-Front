@@ -22,8 +22,8 @@ TARGET_TAG=v1.0.0
 for IMAGE in "${IMAGES[@]}"; do
   echo "Procesando $IMAGE..."
   docker pull ${ORIGIN_USER}/${IMAGE}:${ORIGIN_TAG}
-  docker tag ${ORIGIN_USER}/${IMAGE}:${ORIGIN_TAG} ${TARGET_REGISTRY}/hub.docker.com/${ORIGIN_USER}/${IMAGE}:${TARGET_TAG}
-  docker push ${TARGET_REGISTRY}/hub.docker.com/${ORIGIN_USER}/${IMAGE}:${TARGET_TAG}
+  docker tag ${ORIGIN_USER}/${IMAGE}:${ORIGIN_TAG} ${TARGET_REGISTRY}/${IMAGE}:${TARGET_TAG}
+  docker push ${TARGET_REGISTRY}/${IMAGE}:${TARGET_TAG}
 done
 
 echo "Todas las imágenes han sido retageadas y subidas correctamente."
