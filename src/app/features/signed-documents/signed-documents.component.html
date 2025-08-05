@@ -97,21 +97,21 @@
             <table *ngIf="!isLoading" class="table">
               <thead>
                 <tr>
-                  <th class="sortable" (click)="onSort('fileName')">
+                  <th class="sortable" (click)="onSort('originalFilename')">
                     Documento
-                    <span class="sort-icon">{{ getSortIcon('fileName') }}</span>
+                    <span class="sort-icon">{{ getSortIcon('originalFilename') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('userId')">
+                  <th class="sortable" (click)="onSort('firmanteNombre')">
                     Firmante
-                    <span class="sort-icon">{{ getSortIcon('userId') }}</span>
+                    <span class="sort-icon">{{ getSortIcon('firmanteNombre') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('dni')">
+                  <th class="sortable" (click)="onSort('firmanteDni')">
                     DNI
-                    <span class="sort-icon">{{ getSortIcon('dni') }}</span>
+                    <span class="sort-icon">{{ getSortIcon('firmanteDni') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('signatureDate')">
+                  <th class="sortable" (click)="onSort('signedAt')">
                     Fecha de Firma
-                    <span class="sort-icon">{{ getSortIcon('signatureDate') }}</span>
+                    <span class="sort-icon">{{ getSortIcon('signedAt') }}</span>
                   </th>
                   <th class="sortable" (click)="onSort('createdAt')">
                     Fecha de Creación
@@ -121,9 +121,9 @@
                     Estado
                     <span class="sort-icon">{{ getSortIcon('status') }}</span>
                   </th>
-                  <th class="sortable" (click)="onSort('documentSize')">
-                    Tamaño
-                    <span class="sort-icon">{{ getSortIcon('documentSize') }}</span>
+                  <th class="sortable" (click)="onSort('signatureType')">
+                    Tipo
+                    <span class="sort-icon">{{ getSortIcon('signatureType') }}</span>
                   </th>
                   <th class="actions-col">Acciones</th>
                 </tr>
@@ -151,21 +151,21 @@
                 <tr *ngFor="let document of filteredDocuments" class="document-row">
                   <td>
                     <div class="document-info">
-                      <div class="document-name">{{ document.fileName || 'N/A' }}</div>
-                      <div class="document-path" *ngIf="document.documentPath">{{ document.documentPath }}</div>
+                      <div class="document-name">{{ document.originalFilename || 'N/A' }}</div>
+                      <div class="document-signed" *ngIf="document.signedFilename">{{ document.signedFilename }}</div>
                     </div>
                   </td>
                   <td>
                     <div class="firmante-info">
-                      <div class="firmante-name">{{ getUserName(document.userId) }}</div>
-                      <div class="firmante-email">{{ getUserEmail(document.userId) }}</div>
+                      <div class="firmante-name">{{ document.firmanteNombre || 'N/A' }}</div>
+                      <div class="firmante-cargo" *ngIf="document.cargoFirmante">{{ document.cargoFirmante }}</div>
                     </div>
                   </td>
                   <td>
-                    <div class="dni-info">{{ document.dni || 'N/A' }}</div>
+                    <div class="dni-info">{{ document.firmanteDni || 'N/A' }}</div>
                   </td>
                   <td>
-                    <div class="date">{{ formatDate(document.signatureDate) }}</div>
+                    <div class="date">{{ document.signedAt ? formatDate(document.signedAt) : 'N/A' }}</div>
                   </td>
                   <td>
                     <div class="date">{{ formatDate(document.createdAt) }}</div>
@@ -176,7 +176,7 @@
                     </span>
                   </td>
                   <td>
-                    <div class="file-size">{{ formatFileSize(document.documentSize) }}</div>
+                    <div class="signature-type">{{ document.signatureType || 'N/A' }}</div>
                   </td>
                   <td>
                     <div class="actions">
@@ -246,20 +246,20 @@
         <div class="detail-section">
           <h3>Información del Documento</h3>
           <div class="detail-row">
-            <label>Nombre del archivo:</label>
-            <span>{{ selectedDocument.fileName || 'N/A' }}</span>
+            <label>Nombre original:</label>
+            <span>{{ selectedDocument.originalFilename || 'N/A' }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedDocument.signedFilename">
+            <label>Nombre firmado:</label>
+            <span>{{ selectedDocument.signedFilename }}</span>
           </div>
           <div class="detail-row">
-            <label>Tipo de documento:</label>
-            <span>{{ selectedDocument.documentType || 'N/A' }}</span>
+            <label>UUID del archivo:</label>
+            <span class="file-path">{{ selectedDocument.fileUuid || 'N/A' }}</span>
           </div>
           <div class="detail-row">
-            <label>Ruta del archivo:</label>
-            <span class="file-path">{{ selectedDocument.documentPath || 'N/A' }}</span>
-          </div>
-          <div class="detail-row">
-            <label>Tamaño:</label>
-            <span>{{ formatFileSize(selectedDocument.documentSize) }}</span>
+            <label>URL local:</label>
+            <span>{{ selectedDocument.localUrl || 'N/A' }}</span>
           </div>
           <div class="detail-row">
             <label>Estado:</label>
@@ -273,15 +273,15 @@
           <h3>Información del Firmante</h3>
           <div class="detail-row">
             <label>Firmante:</label>
-            <span>{{ getUserName(selectedDocument.userId) }}</span>
+            <span>{{ selectedDocument.firmanteNombre || 'N/A' }}</span>
           </div>
           <div class="detail-row">
-            <label>Email:</label>
-            <span>{{ getUserEmail(selectedDocument.userId) }}</span>
+            <label>ID Usuario:</label>
+            <span>{{ selectedDocument.firmanteUserId || 'N/A' }}</span>
           </div>
           <div class="detail-row">
             <label>DNI:</label>
-            <span>{{ selectedDocument.dni || 'N/A' }}</span>
+            <span>{{ selectedDocument.firmanteDni || 'N/A' }}</span>
           </div>
           <div class="detail-row" *ngIf="selectedDocument.cargoFirmante">
             <label>Cargo:</label>
@@ -293,21 +293,21 @@
           <h3>Información de Firma</h3>
           <div class="detail-row">
             <label>Fecha de firma:</label>
-            <span>{{ formatDate(selectedDocument.signatureDate) }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedDocument.motivo">
-            <label>Motivo:</label>
-            <span>{{ selectedDocument.motivo }}</span>
-          </div>
-          <div class="detail-row" *ngIf="selectedDocument.localidad">
-            <label>Localidad:</label>
-            <span>{{ selectedDocument.localidad }}</span>
+            <span>{{ selectedDocument.signedAt ? formatDate(selectedDocument.signedAt) : 'N/A' }}</span>
           </div>
           <div class="detail-row">
             <label>Tipo de firma:</label>
-            <span class="badge" [class]="selectedDocument.isVisa ? 'badge-info' : 'badge-success'">
-              {{ selectedDocument.isVisa ? 'Visado' : 'Firma Digital' }}
+            <span class="badge badge-success">
+              {{ selectedDocument.signatureType || 'N/A' }}
             </span>
+          </div>
+          <div class="detail-row" *ngIf="selectedDocument.idDocumentoProcesoFirma">
+            <label>ID Documento Proceso:</label>
+            <span>{{ selectedDocument.idDocumentoProcesoFirma }}</span>
+          </div>
+          <div class="detail-row" *ngIf="selectedDocument.idGrupoProcesoFirma">
+            <label>ID Grupo Proceso:</label>
+            <span>{{ selectedDocument.idGrupoProcesoFirma }}</span>
           </div>
         </div>
 
@@ -316,10 +316,6 @@
           <div class="detail-row">
             <label>Fecha de registro:</label>
             <span>{{ formatDate(selectedDocument.createdAt) }}</span>
-          </div>
-          <div class="detail-row">
-            <label>Última actualización:</label>
-            <span>{{ formatDate(selectedDocument.updatedAt) }}</span>
           </div>
         </div>
       </div>
