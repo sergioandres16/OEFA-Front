@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { User, UserRole, UserStatus, ApiResponse } from '../models/user.model';
+import { environment } from '../../../environments/environment';
 
 export interface CreateFirmanteRequest {
   nombre: string;
@@ -84,8 +85,8 @@ export interface UserListParams {
   providedIn: 'root'
 })
 export class UserService {
-  private readonly API_URL = 'https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe/auth/api/v1';
-  
+  private readonly API_URL = `${environment.apiBaseUrl}/auth/api/v1`;
+
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   public isLoading$ = this.isLoadingSubject.asObservable();
 
@@ -99,7 +100,7 @@ export class UserService {
    */
   getAllUsers(): Observable<GetUsersResponse> {
     this.isLoadingSubject.next(true);
-    
+
     return this.http.get<GetUsersResponse>(`${this.API_URL}/admin/users`)
       .pipe(
         tap(() => this.isLoadingSubject.next(false)),
@@ -112,9 +113,9 @@ export class UserService {
 
   listUsers(params?: UserListParams): Observable<PagedResponse<User>> {
     this.isLoadingSubject.next(true);
-    
+
     let httpParams = new HttpParams();
-    
+
     if (params?.nombre) httpParams = httpParams.set('nombre', params.nombre);
     if (params?.email) httpParams = httpParams.set('email', params.email);
     if (params?.dni) httpParams = httpParams.set('dni', params.dni);
@@ -138,7 +139,7 @@ export class UserService {
    */
   createFirmante(request: CreateFirmanteRequest): Observable<CreateFirmanteResponse> {
     this.isLoadingSubject.next(true);
-    
+
     return this.http.post<CreateFirmanteResponse>(`${this.API_URL}/admin/create-firmante`, request)
       .pipe(
         tap(() => this.isLoadingSubject.next(false)),
@@ -154,7 +155,7 @@ export class UserService {
    */
   resendCredentials(request: ResendCredentialsRequest): Observable<ApiResponse> {
     this.isLoadingSubject.next(true);
-    
+
     return this.http.post<ApiResponse>(`${this.API_URL}/admin/resend-credentials`, request)
       .pipe(
         tap(() => this.isLoadingSubject.next(false)),
@@ -183,13 +184,13 @@ export class UserService {
    * Mock methods for user management (CRUD operations not in API)
    * These simulate what would be real endpoints
    */
-  
+
   /**
    * Get firmante by ID (Admin only)
    */
   getUserById(id: number): Observable<ApiResponse<User>> {
     this.isLoadingSubject.next(true);
-    
+
     return this.http.get<ApiResponse<User>>(`${this.API_URL}/admin/firmantes/${id}`)
       .pipe(
         tap(() => this.isLoadingSubject.next(false)),
@@ -205,7 +206,7 @@ export class UserService {
    */
   updateUser(id: number, updateData: { email?: string; dni?: string; cargo?: string }): Observable<ApiResponse> {
     this.isLoadingSubject.next(true);
-    
+
     return this.http.put<ApiResponse>(`${this.API_URL}/admin/users/${id}`, updateData)
       .pipe(
         tap(() => this.isLoadingSubject.next(false)),
@@ -221,7 +222,7 @@ export class UserService {
    */
   deleteUser(id: number): Observable<ApiResponse> {
     this.isLoadingSubject.next(true);
-    
+
     return this.http.delete<ApiResponse>(`${this.API_URL}/admin/users/${id}`)
       .pipe(
         tap(() => this.isLoadingSubject.next(false)),

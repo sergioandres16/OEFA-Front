@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
 
 interface FirmanteStats {
   totalFirmantes: number;
@@ -39,14 +40,14 @@ interface DashboardStats {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  private readonly API_URL = 'https://gateway-route-fmovil.apps.okd-dev.oefa.gob.pe';
-  
+  private readonly API_URL = `${environment.apiBaseUrl}`;
+
   stats: DashboardStats = {
     firmantes: { totalFirmantes: 0, activeFirmantes: 0, pendingFirmantes: 0 },
     certificates: { totalCertificates: 0, validCertificates: 0, invalidCertificates: 0 },
     documents: { totalDocuments: 0, signedDocuments: 0, visadoDocuments: 0, completedDocuments: 0, pendingDocuments: 0 }
   };
-  
+
   isLoading = true;
   error: string | null = null;
 
@@ -75,7 +76,7 @@ export class DashboardComponent implements OnInit {
         this.http.get<any>(`${this.API_URL}/certificates/api/v1/stats`, { headers }).toPromise(),
         this.http.get<any>(`${this.API_URL}/signatures/api/v1/admin/stats`, { headers }).toPromise()
       ]);
-      
+
       this.stats = {
         firmantes: firmanteStats?.data || { totalFirmantes: 0, activeFirmantes: 0, pendingFirmantes: 0 },
         certificates: certificateStats?.data || { totalCertificates: 0, validCertificates: 0, invalidCertificates: 0 },
@@ -85,7 +86,7 @@ export class DashboardComponent implements OnInit {
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
       this.error = 'Error al cargar las estadísticas';
-      
+
       // Fallback to default values on error
       this.stats = {
         firmantes: { totalFirmantes: 0, activeFirmantes: 0, pendingFirmantes: 0 },
