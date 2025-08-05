@@ -35,7 +35,7 @@ if [ $? -eq 0 ]; then
     # Test container locally if debug mode
     if [[ "$DEBUG_MODE" == "--debug" ]]; then
         echo "🧪 Testing container locally..."
-        docker run --rm -d --name test-frontend-no-volumes \
+        docker run -d --name test-frontend-no-volumes \
             -p 9080:9080 \
             -e BACKEND_PROXY_URL="https://srvlb01.okd-dev.oefa.gob.pe" \
             "${FULL_IMAGE_NAME}"
