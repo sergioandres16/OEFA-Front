@@ -12,7 +12,8 @@ RUN rm -rf /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*
 # Copy built Angular app
 COPY --from=builder /app/dist /usr/share/nginx/html
 # Copy custom Nginx config (sin volúmenes)
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY server.conf.template /etc/nginx/templates/default.conf.template
 # Configure OpenShift-compatible permissions (todos los directorios necesarios)
 RUN mkdir -p /var/run/nginx /etc/nginx/conf.d && \
     chgrp -R 0 /usr/share/nginx/html /var/cache/nginx /var/log/nginx /var/run/nginx /etc/nginx/conf.d /etc/nginx/templates && \
