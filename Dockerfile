@@ -5,16 +5,16 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build -- --configuration=production --output-path=/app/dist
-# Stage 2: Nginx with OpenShift optimizations (Sin volúmenes)
+# Stage 2: Nginx with OpenShift optimizations
 FROM nginx:1.25-alpine
 # Remove default configs
 RUN rm -rf /etc/nginx/conf.d/default.conf /usr/share/nginx/html/*
 # Copy built Angular app
 COPY --from=builder /app/dist /usr/share/nginx/html
-# Copy custom Nginx config (sin volúmenes)
+# Copy simplified nginx configurations
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY server.conf.template /etc/nginx/templates/default.conf.template
-# Configure OpenShift-compatible permissions (todos los directorios necesarios)
+# Configure OpenShift-compatible permissions
 RUN mkdir -p /var/run/nginx /etc/nginx/conf.d && \
     chgrp -R 0 /usr/share/nginx/html /var/cache/nginx /var/log/nginx /var/run/nginx /etc/nginx/conf.d /etc/nginx/templates && \
     chmod -R g=u /usr/share/nginx/html /var/cache/nginx /var/log/nginx /var/run/nginx /etc/nginx/conf.d /etc/nginx/templates && \
