@@ -13,8 +13,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application with increased budget limits
+RUN npm run build -- --configuration=production
 
 # Production stage with nginx
 FROM nginx:alpine
