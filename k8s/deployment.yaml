@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: fmovil-microservices
+  namespace: fmovil
   labels:
-    app: fmovil-microservices
+    app: fmovil-frontend
     component: frontend
 spec:
   replicas: 2
@@ -15,16 +15,16 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: fmovil-microservices
+      app: fmovil-frontend
       component: frontend
   template:
     metadata:
       labels:
-        app: fmovil-microservices
+        app: fmovil-frontend
         component: frontend
     spec:
-      securityContext:
-        fsGroup: 1001
+      imagePullSecrets:
+        - name: registry-credentials-fmovil
       containers:
       - name: frontend
         image: harbor.oefa.gob.pe/fmovil/hectorvc2022/fmovil-frontend:v1.0.0
@@ -68,7 +68,6 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           runAsNonRoot: true
-          runAsUser: 1001
           capabilities:
             drop:
             - ALL

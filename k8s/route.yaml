@@ -2,9 +2,9 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: frontend-route
-  namespace: fmovil-microservices
+  namespace: fmovil
   labels:
-    app: fmovil-microservices
+    app: fmovil-frontend
     component: frontend
   annotations:
     haproxy.router.openshift.io/timeout: "60s"

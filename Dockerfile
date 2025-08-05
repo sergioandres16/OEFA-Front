@@ -19,11 +19,21 @@ RUN npm run build -- --configuration=production
 # Production stage with nginx
 FROM nginx:alpine
 
+# Create nginx user and directories
+RUN addgroup -g 1001 -S nginx && \
+    adduser -S -D -H -u 1001 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx && \
+    mkdir -p /var/cache/nginx /var/log/nginx /var/run/nginx && \
+    chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run/nginx /usr/share/nginx/html && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx /var/run/nginx /usr/share/nginx/html
+
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built application from build stage
 COPY --from=build /app/dist/OEFAFront /usr/share/nginx/html
+
+# Set ownership of the html directory
+RUN chown -R nginx:nginx /usr/share/nginx/html
 
 # Create environment script inline
 RUN echo '#!/bin/sh' > /docker-entrypoint.d/env.sh && \
@@ -41,7 +51,11 @@ RUN echo '#!/bin/sh' > /docker-entrypoint.d/env.sh && \
     echo 'sed -i "s|__API_BASE_URL__|$API_BASE_URL|g" "$MAIN_JS_FILE"' >> /docker-entrypoint.d/env.sh && \
     echo 'sed -i "s|__FRONTEND_BASE_URL__|$FRONTEND_BASE_URL|g" "$MAIN_JS_FILE"' >> /docker-entrypoint.d/env.sh && \
     echo 'echo "Environment variables injected successfully"' >> /docker-entrypoint.d/env.sh && \
-    chmod +x /docker-entrypoint.d/env.sh
+    chmod +x /docker-entrypoint.d/env.sh && \
+    chown nginx:nginx /docker-entrypoint.d/env.sh
+
+# Switch to non-root user
+USER nginx
 
 # Expose port 9080
 EXPOSE 9080

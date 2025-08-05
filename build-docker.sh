@@ -7,7 +7,7 @@ set -e
 
 # Default values
 DEFAULT_TAG="v1.0.0"
-DEFAULT_REGISTRY="harbor.oefa.gob.pe/fmovil/hectorvc2022"
+DEFAULT_REGISTRY="harbor.oefa.gob.pe/fmovil/hub.docker.com/hectorvc2022"
 IMAGE_NAME="fmovil-frontend"
 
 # Parse arguments
@@ -34,18 +34,18 @@ docker build -t "${FULL_IMAGE_NAME}" .
 
 if [ $? -eq 0 ]; then
     echo "✅ Docker image built successfully: ${FULL_IMAGE_NAME}"
-    
+
     # Show image size
     echo "📊 Image size:"
     docker images "${FULL_IMAGE_NAME}" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
-    
+
     # Ask if user wants to push the image
     read -p "🚀 Do you want to push the image to registry? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "📤 Pushing image to registry..."
         docker push "${FULL_IMAGE_NAME}"
-        
+
         if [ $? -eq 0 ]; then
             echo "✅ Image pushed successfully to registry"
         else
@@ -53,13 +53,13 @@ if [ $? -eq 0 ]; then
             exit 1
         fi
     fi
-    
+
     echo
     echo "=============================================="
     echo "Build completed successfully!"
     echo "Image: ${FULL_IMAGE_NAME}"
     echo "=============================================="
-    
+
 else
     echo "❌ Docker build failed"
     exit 1
