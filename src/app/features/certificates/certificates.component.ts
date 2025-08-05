@@ -132,7 +132,9 @@ export class CertificatesComponent implements OnInit {
     this.userService.getAllUsers().subscribe({
       next: (response) => {
         if (response.success && response.data) {
-          this.users = response.data.content.filter(user => user.role === 'ROLE_FIRMANTE');
+          this.users = response.data.content.filter(user => 
+            user.role === 'ROLE_FIRMANTE' && user.status === 'ACTIVO'
+          );
           // Re-aplicar filtros después de cargar usuarios para que funcione la búsqueda por firmante
           this.applyFilters();
         }
