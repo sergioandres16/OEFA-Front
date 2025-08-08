@@ -18,7 +18,7 @@ import { SidebarComponent } from '../../shared/components/sidebar/sidebar.compon
 export class UsersComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
-  
+
   // Filters
   filters = {
     search: '',
@@ -26,17 +26,17 @@ export class UsersComponent implements OnInit {
     dateFrom: '',
     dateTo: ''
   };
-  
+
   // Pagination
   currentPage = 0;
   pageSize = 10;
   totalElements = 0;
   totalPages = 0;
-  
+
   // Sorting
   sortBy = 'createdAt';
   sortDirection: 'asc' | 'desc' = 'desc';
-  
+
   // UI State
   isLoading = false;
   showCreateModal = false;
@@ -45,12 +45,12 @@ export class UsersComponent implements OnInit {
   showDeleteModal = false;
   selectedUser: User | null = null;
   userToDelete: User | null = null;
-  
+
   // Forms
   createUserForm: FormGroup;
   editUserForm: FormGroup;
-  
-  // Options  
+
+  // Options
   statusOptions = [
     { value: '', label: 'Todos los estados' },
     { value: 'ACTIVO', label: 'Activo' },
@@ -90,7 +90,7 @@ export class UsersComponent implements OnInit {
 
   loadUsers() {
     this.isLoading = true;
-    
+
     const params: UserListParams = {
       page: this.currentPage,
       size: this.pageSize,
@@ -106,7 +106,7 @@ export class UsersComponent implements OnInit {
         if (response.success) {
           // Filter only firmantes (exclude admins and service accounts) and only active/pending status
           const firmantesOnly = response.data.content.filter(user => {
-            return user.role === 'ROLE_FIRMANTE' && 
+            return user.role === 'ROLE_FIRMANTE' &&
                    (user.status === 'ACTIVO' || user.status === 'PENDIENTE');
           });
           this.users = firmantesOnly;
@@ -131,30 +131,30 @@ export class UsersComponent implements OnInit {
     // Apply filters first
     this.filteredUsers = this.users.filter(user => {
       // Search filter - now includes cargo
-      const matchesSearch = !this.filters.search || 
+      const matchesSearch = !this.filters.search ||
         user.nombre.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         user.apellido.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         user.email.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         (user.dni?.includes(this.filters.search) || false) ||
         (user.cargo?.toLowerCase().includes(this.filters.search.toLowerCase()) || false);
-      
+
       // Status filter
       const matchesStatus = !this.filters.status || user.status === this.filters.status;
-      
+
       // Date range filter
       let matchesDateRange = true;
       if (this.filters.dateFrom || this.filters.dateTo) {
         const userDate = new Date(user.createdAt!);
         const fromDate = this.filters.dateFrom ? new Date(this.filters.dateFrom) : null;
         const toDate = this.filters.dateTo ? new Date(this.filters.dateTo + 'T23:59:59') : null;
-        
+
         if (fromDate && userDate < fromDate) matchesDateRange = false;
         if (toDate && userDate > toDate) matchesDateRange = false;
       }
-      
+
       return matchesSearch && matchesStatus && matchesDateRange;
     });
-    
+
     // Then apply sorting
     this.applySorting();
   }
@@ -163,7 +163,7 @@ export class UsersComponent implements OnInit {
     this.filteredUsers.sort((a, b) => {
       let valueA: any;
       let valueB: any;
-      
+
       switch (this.sortBy) {
         case 'nombre':
           valueA = `${a.nombre} ${a.apellido}`.toLowerCase();
@@ -192,7 +192,7 @@ export class UsersComponent implements OnInit {
         default:
           return 0;
       }
-      
+
       if (valueA < valueB) {
         return this.sortDirection === 'asc' ? -1 : 1;
       }
@@ -247,11 +247,11 @@ export class UsersComponent implements OnInit {
     const pages = [];
     const startPage = Math.max(0, this.currentPage - 2);
     const endPage = Math.min(this.totalPages - 1, this.currentPage + 2);
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   }
 
@@ -295,7 +295,7 @@ export class UsersComponent implements OnInit {
       dni: formData.dni,
       cargo: formData.cargo
     };
-    
+
     this.userService.createFirmante(request).subscribe({
       next: (response) => {
         if (response.success) {
@@ -311,10 +311,10 @@ export class UsersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error creating user:', error);
-        
+
         // Try to extract the API error message
         let errorMessage = 'Error al crear el usuario';
-        
+
         if (error.error && error.error.message) {
           // API returned error in expected format
           errorMessage = error.error.message;
@@ -322,7 +322,7 @@ export class UsersComponent implements OnInit {
           // HTTP error message
           errorMessage = error.message;
         }
-        
+
         this.notificationService.error('Error al crear usuario', errorMessage);
       }
     });
@@ -331,7 +331,7 @@ export class UsersComponent implements OnInit {
   onEditUser(user: User) {
     this.selectedUser = user;
     this.showEditModal = true;
-    
+
     // Populate the edit form with current user data (only editable fields)
     this.editUserForm.patchValue({
       email: user.email,
@@ -352,7 +352,7 @@ export class UsersComponent implements OnInit {
       dni: formData.dni,
       cargo: formData.cargo
     };
-    
+
     this.userService.updateUser(this.selectedUser.id, updateData).subscribe({
       next: (response) => {
         if (response.success) {
@@ -368,14 +368,14 @@ export class UsersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating user:', error);
-        
+
         let errorMessage = 'Error al actualizar el firmante';
         if (error.error && error.error.message) {
           errorMessage = error.error.message;
         } else if (error.message) {
           errorMessage = error.message;
         }
-        
+
         this.notificationService.error('Error al actualizar firmante', errorMessage);
       }
     });
@@ -407,14 +407,14 @@ export class UsersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error deleting user:', error);
-        
+
         let errorMessage = 'No se pudo eliminar el firmante. Inténtelo nuevamente.';
         if (error.error && error.error.message) {
           errorMessage = error.error.message;
         } else if (error.message) {
           errorMessage = error.message;
         }
-        
+
         this.notificationService.error('Error al eliminar firmante', errorMessage);
       }
     });
@@ -425,9 +425,9 @@ export class UsersComponent implements OnInit {
       const request = {
         email: user.email,
         dni: user.dni,
-        regeneratePassword: false
+        regeneratePassword: true
       };
-      
+
       this.userService.resendCredentials(request).subscribe({
         next: (response) => {
           this.notificationService.success('Credenciales reenviadas', `Se han enviado las credenciales a ${user.email}`);
