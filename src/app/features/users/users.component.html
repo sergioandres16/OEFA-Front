@@ -583,3 +583,87 @@
     </main>
   </div>
 </div>
+
+<!-- Resend Credentials Modal -->
+<div class="modal-overlay" *ngIf="showResendCredentialsModal" (click)="closeResendCredentialsModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Reenviar Credenciales</h2>
+      <button class="modal-close" (click)="closeResendCredentialsModal()">
+        <i class="icon-close"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="resendCredentialsForm" (ngSubmit)="confirmResendCredentials()" class="modal-body">
+      <div class="user-info-section" *ngIf="selectedUser">
+        <div class="info-card">
+          <h3>Información del Firmante</h3>
+          <div class="info-row">
+            <label>Nombre:</label>
+            <span>{{ selectedUser.nombre }} {{ selectedUser.apellido }}</span>
+          </div>
+          <div class="info-row">
+            <label>Email:</label>
+            <span>{{ selectedUser.email }}</span>
+          </div>
+          <div class="info-row">
+            <label>DNI:</label>
+            <span>{{ selectedUser.dni }}</span>
+          </div>
+          <div class="info-row">
+            <label>Estado actual:</label>
+            <span class="badge" [class]="getStatusBadgeClass(selectedUser.status)">
+              {{ getStatusDisplayName(selectedUser.status) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Opciones de Reenvío</h3>
+        
+        <div class="form-group checkbox-group">
+          <label class="checkbox-container">
+            <input 
+              type="checkbox" 
+              formControlName="regeneratePassword">
+            <span class="checkmark"></span>
+            <div class="checkbox-content">
+              <strong>Generar nueva contraseña temporal</strong>
+              <p class="help-text">Genera una nueva contraseña temporal y la incluye en el correo. El usuario deberá cambiarla al iniciar sesión.</p>
+            </div>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="warning-section">
+        <div class="warning-card">
+          <div class="warning-icon">
+            <i class="icon-info"></i>
+          </div>
+          <div class="warning-content">
+            <h4>¿Qué sucederá?</h4>
+            <ul>
+              <li>Se enviará un correo con las credenciales de acceso a <strong>{{ selectedUser?.email }}</strong></li>
+              <li *ngIf="resendCredentialsForm.get('regeneratePassword')?.value">Se generará una nueva contraseña temporal</li>
+              <li *ngIf="!resendCredentialsForm.get('regeneratePassword')?.value">Se utilizará la contraseña actual del usuario</li>
+              <li>El firmante recibirá las instrucciones para acceder al sistema</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeResendCredentialsModal()">
+          <i class="icon-close"></i>
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="icon-mail"></i>
+          Reenviar Credenciales
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

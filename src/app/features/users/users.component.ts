@@ -43,12 +43,14 @@ export class UsersComponent implements OnInit {
   showEditModal = false;
   showViewModal = false;
   showDeleteModal = false;
+  showResendCredentialsModal = false;
   selectedUser: User | null = null;
   userToDelete: User | null = null;
 
   // Forms
   createUserForm: FormGroup;
   editUserForm: FormGroup;
+  resendCredentialsForm: FormGroup;
 
   // Options
   statusOptions = [
@@ -64,6 +66,7 @@ export class UsersComponent implements OnInit {
   ) {
     this.createUserForm = this.createForm();
     this.editUserForm = this.createEditForm();
+    this.resendCredentialsForm = this.createResendCredentialsForm();
   }
 
   ngOnInit() {
@@ -85,6 +88,12 @@ export class UsersComponent implements OnInit {
       email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
       dni: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
       cargo: ['', [Validators.required, Validators.maxLength(150)]]
+    });
+  }
+
+  createResendCredentialsForm(): FormGroup {
+    return this.fb.group({
+      regeneratePassword: [false]
     });
   }
 
@@ -281,6 +290,21 @@ export class UsersComponent implements OnInit {
     this.userToDelete = null;
   }
 
+  openResendCredentialsModal(user: User) {
+    this.selectedUser = user;
+    this.showResendCredentialsModal = true;
+    this.resendCredentialsForm.reset();
+    this.resendCredentialsForm.patchValue({
+      regeneratePassword: false
+    });
+  }
+
+  closeResendCredentialsModal() {
+    this.showResendCredentialsModal = false;
+    this.selectedUser = null;
+    this.resendCredentialsForm.reset();
+  }
+
   onCreateUser() {
     if (this.createUserForm.invalid) {
       this.markFormGroupTouched(this.createUserForm);
@@ -421,25 +445,39 @@ export class UsersComponent implements OnInit {
   }
 
   onResendCredentials(user: User) {
-    if (confirm(`¿Reenviar credenciales de acceso a ${user.email}?`)) {
-      const request = {
-        email: user.email,
-        dni: user.dni,
-        regeneratePassword: true
-      };
+    this.openResendCredentialsModal(user);
+  }
 
-      this.userService.resendCredentials(request).subscribe({
-        next: (response) => {
-          this.notificationService.success('Credenciales reenviadas', `Se han enviado las credenciales a ${user.email}`);
-          // Refresh the user list to show any updated status
-          this.loadUsers();
-        },
-        error: (error) => {
-          console.error('Error resending credentials:', error);
-          this.notificationService.error('Error al reenviar credenciales', 'No se pudieron enviar las credenciales. Inténtelo nuevamente.');
+  confirmResendCredentials() {
+    if (!this.selectedUser) return;
+
+    const formData = this.resendCredentialsForm.value;
+    const request = {
+      email: this.selectedUser.email,
+      dni: this.selectedUser.dni,
+      regeneratePassword: formData.regeneratePassword || false
+    };
+
+    this.userService.resendCredentials(request).subscribe({
+      next: (response) => {
+        this.notificationService.success(
+          'Credenciales reenviadas', 
+          `Se han enviado las credenciales a ${this.selectedUser!.email}`
+        );
+        this.closeResendCredentialsModal();
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error('Error resending credentials:', error);
+        let errorMessage = 'No se pudieron enviar las credenciales. Inténtelo nuevamente.';
+        if (error.error && error.error.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
         }
-      });
-    }
+        this.notificationService.error('Error al reenviar credenciales', errorMessage);
+      }
+    });
   }
 
 
