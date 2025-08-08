@@ -455,7 +455,7 @@ export class UsersComponent implements OnInit {
     const request = {
       email: this.selectedUser.email,
       dni: this.selectedUser.dni,
-      regeneratePassword: formData.regeneratePassword || false
+      regeneratePassword: this.selectedUser.status === 'ACTIVO' ? (formData.regeneratePassword || false) : false
     };
 
     this.userService.resendCredentials(request).subscribe({
