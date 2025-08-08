@@ -451,11 +451,10 @@ export class UsersComponent implements OnInit {
   confirmResendCredentials() {
     if (!this.selectedUser) return;
 
-    const formData = this.resendCredentialsForm.value;
     const request = {
       email: this.selectedUser.email,
       dni: this.selectedUser.dni,
-      regeneratePassword: this.selectedUser.status === 'ACTIVO' ? (formData.regeneratePassword || false) : false
+      regeneratePassword: this.selectedUser.status === 'ACTIVO'
     };
 
     this.userService.resendCredentials(request).subscribe({

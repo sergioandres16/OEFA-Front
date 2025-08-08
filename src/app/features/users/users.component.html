@@ -588,7 +588,7 @@
 <div class="modal-overlay" *ngIf="showResendCredentialsModal" (click)="closeResendCredentialsModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Reenviar Credenciales</h2>
+      <h2>{{ selectedUser?.status === 'ACTIVO' ? 'Cambio de Credenciales' : 'Reenvío de Credenciales' }}</h2>
       <button class="modal-close" (click)="closeResendCredentialsModal()">
         <i class="icon-close"></i>
       </button>
@@ -619,27 +619,6 @@
         </div>
       </div>
 
-      <!-- Opciones según el estado del usuario -->
-      <div class="action-section" *ngIf="selectedUser?.status === 'ACTIVO'">
-        <h3>Cambio de Credenciales</h3>
-        <div class="form-group checkbox-group">
-          <label class="checkbox-container">
-            <input 
-              type="checkbox" 
-              formControlName="regeneratePassword">
-            <span class="checkmark"></span>
-            <div class="checkbox-content">
-              <strong>Generar nueva contraseña temporal</strong>
-              <p class="help-text">Genera una nueva contraseña temporal y la incluye en el correo.</p>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div class="action-section" *ngIf="selectedUser?.status === 'PENDIENTE'">
-        <h3>Reenviar Correo de Activación</h3>
-        <p class="info-text">Se enviará nuevamente el correo de activación con las credenciales iniciales.</p>
-      </div>
 
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" (click)="closeResendCredentialsModal()">
