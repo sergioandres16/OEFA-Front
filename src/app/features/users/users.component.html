@@ -619,9 +619,9 @@
         </div>
       </div>
 
-      <div class="form-section">
-        <h3>Opciones de Reenvío</h3>
-        
+      <!-- Opciones según el estado del usuario -->
+      <div class="action-section" *ngIf="selectedUser?.status === 'ACTIVO'">
+        <h3>Cambio de Credenciales</h3>
         <div class="form-group checkbox-group">
           <label class="checkbox-container">
             <input 
@@ -630,28 +630,15 @@
             <span class="checkmark"></span>
             <div class="checkbox-content">
               <strong>Generar nueva contraseña temporal</strong>
-              <p class="help-text">Genera una nueva contraseña temporal y la incluye en el correo. El usuario deberá cambiarla al iniciar sesión.</p>
+              <p class="help-text">Genera una nueva contraseña temporal y la incluye en el correo.</p>
             </div>
           </label>
         </div>
-
       </div>
 
-      <div class="warning-section">
-        <div class="warning-card">
-          <div class="warning-icon">
-            <i class="icon-info"></i>
-          </div>
-          <div class="warning-content">
-            <h4>¿Qué sucederá?</h4>
-            <ul>
-              <li>Se enviará un correo con las credenciales de acceso a <strong>{{ selectedUser?.email }}</strong></li>
-              <li *ngIf="resendCredentialsForm.get('regeneratePassword')?.value">Se generará una nueva contraseña temporal</li>
-              <li *ngIf="!resendCredentialsForm.get('regeneratePassword')?.value">Se utilizará la contraseña actual del usuario</li>
-              <li>El firmante recibirá las instrucciones para acceder al sistema</li>
-            </ul>
-          </div>
-        </div>
+      <div class="action-section" *ngIf="selectedUser?.status === 'PENDIENTE'">
+        <h3>Reenviar Correo de Activación</h3>
+        <p class="info-text">Se enviará nuevamente el correo de activación con las credenciales iniciales.</p>
       </div>
 
       <div class="modal-actions">
