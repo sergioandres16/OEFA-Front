@@ -44,6 +44,7 @@ export class UsersComponent implements OnInit {
   showViewModal = false;
   showDeleteModal = false;
   showResendCredentialsModal = false;
+  isResendingCredentials = false;
   selectedUser: User | null = null;
   userToDelete: User | null = null;
 
@@ -303,6 +304,7 @@ export class UsersComponent implements OnInit {
     this.showResendCredentialsModal = false;
     this.selectedUser = null;
     this.resendCredentialsForm.reset();
+    this.isResendingCredentials = false;
   }
 
   onCreateUser() {
@@ -449,7 +451,9 @@ export class UsersComponent implements OnInit {
   }
 
   confirmResendCredentials() {
-    if (!this.selectedUser) return;
+    if (!this.selectedUser || this.isResendingCredentials) return;
+
+    this.isResendingCredentials = true;
 
     const request = {
       email: this.selectedUser.email,
@@ -463,6 +467,7 @@ export class UsersComponent implements OnInit {
           'Credenciales reenviadas', 
           `Se han enviado las credenciales a ${this.selectedUser!.email}`
         );
+        this.isResendingCredentials = false;
         this.closeResendCredentialsModal();
         this.loadUsers();
       },
@@ -474,6 +479,7 @@ export class UsersComponent implements OnInit {
         } else if (error.message) {
           errorMessage = error.message;
         }
+        this.isResendingCredentials = false;
         this.notificationService.error('Error al reenviar credenciales', errorMessage);
       }
     });

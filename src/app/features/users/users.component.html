@@ -625,9 +625,10 @@
           <i class="icon-close"></i>
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary">
-          <i class="icon-mail"></i>
-          Reenviar Credenciales
+        <button type="submit" class="btn btn-primary" [disabled]="isResendingCredentials">
+          <i *ngIf="!isResendingCredentials" class="icon-mail"></i>
+          <i *ngIf="isResendingCredentials" class="loading-spinner"></i>
+          {{ isResendingCredentials ? 'Enviando...' : 'Reenviar Credenciales' }}
         </button>
       </div>
     </form>
